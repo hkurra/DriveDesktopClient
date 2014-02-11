@@ -1,7 +1,7 @@
 /*
  * Contain error code TODO more exception handling classe as inner class
  */
-package Exception;
+package Global;
 
 
 /**
@@ -11,7 +11,7 @@ package Exception;
 public class Error_List
 {
   
-  enum error{
+  enum error {
       ERR_USER_AUTHENTICATION,
       ERR_APP_AUTHORIZATION
   };

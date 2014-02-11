@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *This project would work like as library in future so this class is just for testing this library feature
+ *
  */
 package Main;
 
@@ -15,24 +15,62 @@ package Main;
 import java.io.IOException;
 
 import Authorization.*;
+import FileOperation.UploadCommand;
+import FileOperation.gCommand;
 import Global.SharedInstances;
 import com.google.api.client.auth.oauth2.Credential;
+//import org.json.simple.JSONArray;
+//import org.json.simple.JSONObject;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 
 public class MainDriveCommand {
 
 
     public static void main(String[] args) throws IOException {
         
-        if (args.length < 3 || args[0].isEmpty() || args[1].isEmpty() || args[2].isEmpty()) {
-            System.out.println("Invalid argument");
-            System.exit(1);
-        }
+        assert(args.length == 3 || !args[0].isEmpty() || !args[1].isEmpty() || !args[2].isEmpty()):"Invalid argument";
+        
         SharedInstances.CLIENT_ID = args[0];
         SharedInstances.CLIENT_SECRET = args[1];
         SharedInstances.APPLICATION_NAME = args[2];
   
-        UserAutorization userAutorization = new UserAutorization();
-        Credential credential = userAutorization.authorize();
+        SharedInstances.setUpGDrive();
+        if (SharedInstances.mCredential != null){
+        	System.out.println(SharedInstances.myResources.getString("SUCCESS_AUTHORIZATION_MSSG"));
+        }
+        System.out.println("***************************************************");
+        gCommand gCmd = new UploadCommand("F:/ghk/reaction.txt");
+        gCmd.DoExcute();
+//        do{
+//        	System.out.println("Command Availabele are");
+//        	
+//        	
+//        	  JSONArray a = (JSONArray) parser.parse(new FileReader("resources/client_Secret"));
+//
+//        	  for (Object o : a)
+//        	  {
+//        	    JSONObject person = (JSONObject) o;
+//
+//        	    String name = (String) person.get("name");
+//        	    System.out.println(name);
+//
+//        	    String city = (String) person.get("city");
+//        	    System.out.println(city);
+//
+//        	    String job = (String) person.get("job");
+//        	    System.out.println(job);
+//
+//        	    JSONArray cars = (JSONArray) jsonObject.get("cars");
+//
+//        	    for (Object c : cars)
+//        	    {
+//        	      System.out.println(c+"");
+//        	    }
+//        	  }
+//        	
+//        	
+//        }while(true);
         /*HttpTransport httpTransport = new NetHttpTransport();
         JsonFactory jsonFactory = new JacksonFactory();
 

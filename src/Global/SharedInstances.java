@@ -4,11 +4,18 @@
  */
 package Global;
 
+import Authorization.UserAutorization;
+
+import cache.gDriveFiles;
+
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.drive.Drive;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ResourceBundle;
@@ -59,7 +66,69 @@ public class SharedInstances
      * Global instance of the JSON factory.
      */
     public static final JsonFactory JSON_FACTORY;
+    
+    /**
+     * Global instance of the UserCredential on which you are operating
+     */
+	public static Credential mCredential;
+	
+    /**
+     * Global instance of the User_Authorization.
+     */
+	private static UserAutorization mUserAutorization;
+    /**
+     * Global instance of the Google Drive on which you are operating
+     */
+	public static Drive mDrive;
 
+	/**
+	 * folder MIME type string constant
+	 */
+	public static final String folderMIMEtype = "application/vnd.google-apps.folder";
+	
+	/**
+	 * document MIME type string constant **google docs**
+	 */
+	public static final String documentMIMEtype = "application/vnd.google-apps.document";
+	
+	/**
+	 * audio MIME type string constant
+	 */
+	public static final String audioMIMEtype = "application/vnd.google-apps.audio";
+	/**
+	 * folder MIME type string constant **google drawing**
+	 */
+	public static final String drawingMIMEtype = "application/vnd.google-apps.drawing";
+	/**
+	 * folder MIME type string constant **google file**
+	 */
+	public static final String filerMIMEtype = "application/vnd.google-apps.file";
+	/**
+	 * form MIME type string constant **google form**
+	 */
+	public static final String formMIMEtype = "application/vnd.google-apps.form";
+	/**
+	 * photo MIME type string constant
+	 */
+	public static final String photoMIMEtype = "application/vnd.google-apps.photo";
+	/**
+	 * presentation MIME type string constant   **Google Slides**
+	 */
+	public static final String presentationMIMEtype = "application/vnd.google-apps.presentation";
+	/**
+	 * unknown MIME type string constant
+	 */
+	public static final String unknownMIMEtype = "application/vnd.google-apps.unknown";
+	/**
+	 * video MIME type string constant
+	 */
+	public static final String videoMIMEtype = "application/vnd.google-apps.video";
+	/**
+	 * spreadsheet MIME type string constant **google sheet**
+	 */
+	public static final String spreadSheetMIMEtype = "application/vnd.google-apps.spreadsheet";
+	
+	
     static {
         REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
         myResources = java.util.ResourceBundle.getBundle("resources/Bundle");
@@ -73,7 +142,17 @@ public class SharedInstances
         } catch (IOException ex) {
             Logger.getLogger(SharedInstances.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-
     }
+   public static void setUpGDrive() {
+		mUserAutorization = new UserAutorization();
+		mCredential = mUserAutorization.authorize();
+		mDrive = new Drive.Builder(httpTransport, JSON_FACTORY, mCredential).setApplicationName(APPLICATION_NAME).build();
+		gDriveFiles.CacheAllFiles();
+    }
+    
+    static void changeUser() {
+    	DATA_STORE_DIR.delete();
+    	setUpGDrive();
+   }
+    
 }

@@ -11,6 +11,8 @@ tmp/
 *.bak
 *.swp
 *~.nib
+*.class
+dist/lib/
 local.properties
 .classpath
 .settings/
@@ -192,7 +194,6 @@ $RECYCLE.BIN/
 # Packages
 *.egg
 *.egg-info
-dist/
 build/
 eggs/
 parts/
@@ -213,3 +214,26 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+build.xml
+nbproject/build-impl.xml
+nbproject/genfiles.properties
+nbproject/private/config.properties
+nbproject/private/private.properties
+nbproject/private/private.xml
+nbproject/project.properties
+nbproject/project.xml
+src/FileOperation/UploadCommand.java
+src/FileOperation/gCommand.java
+target/classes/Authorization/UserAutorization.class
+target/classes/FileOperation/UploadCommand.class
+target/classes/FileOperation/gCommand.class
+target/classes/Global/Error_List$error.class
+target/classes/Global/Error_List.class
+target/classes/Global/SharedInstances.class
+target/classes/cache/gDriveFiles.class
+target/classes/resources/client_secrets.json
+target/classes/resources/Bundle.properties
+target/classes/Main/MainDriveCommand.class
+dist/README.TXT
+dist/build-impl.xml
+src/resources/client_secrets.json
