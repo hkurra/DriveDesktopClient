@@ -1,6 +1,6 @@
 package cache;
 /**
- * maintain caching of files of User drive 
+ * maintain caching of metadata of files of User drive 
  * 
  * @author harsh
  */
@@ -43,23 +43,26 @@ public class gDriveFiles {
 	 */
 	public static void CacheAllFiles() {
 		try {
+			getAllFiles().clear();
 			Drive.Files.List list = SharedInstances.mDrive.files().list();
 			 FileList fileList = list.execute();
 			 getAllFiles().addAll(fileList.getItems());
 		} catch (IOException e) {
 			e.printStackTrace();
+			getAllFiles().clear();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			getAllFiles().clear();
 		}
 		finally {
 			//(TODO need testing)in case of failure or refresh we have to clear this structure otherwise it lead to wrong information 
 			//so its your responsibility to cache old copy of structure in case of failure of refreshing
 			//this caching always maintain fresh structure until you refresh 
-			getAllFiles().clear();
 			getDirectoryStructure().clear();
 		}
 		CreateDirectoryStructure();
+		printDirectoryStructure();
 	}
 	
 	/**
@@ -72,17 +75,17 @@ public class gDriveFiles {
 		for (int index = 0;index < getAllFiles().size(); index++) {
 			List<ParentReference> parentList = getAllFiles().get(index).getParents();
 			
-			//if it is file 
-			if (getAllFiles().get(index).getFileExtension() != null) {
-				//if it is a file under default(MyDrive) directory
-				if (parentList.get(0).getIsRoot()) {
-					getDirectoryStructure().add(FileProcessing(getAllFiles().get(index)));
+			//if it is a file/folder under default(MyDrive) directory
+			if (parentList.get(0).getIsRoot()) {
+				//if it is file 
+				if (getAllFiles().get(index).getFileExtension() != null) {
+						getDirectoryStructure().add(FileProcessing(getAllFiles().get(index)));
 				}
-			}
-			//if it is folder
-			else if (getAllFiles().get(index).getFileExtension() == null) {
-				HashMap<String, Object> folderDict = FolderProcessing(getAllFiles().get(index));
-				getDirectoryStructure().add(folderDict);
+				//if it is folder
+				else if (getAllFiles().get(index).getFileExtension() == null) {
+					HashMap<String, Object> folderDict = FolderProcessing(getAllFiles().get(index));
+					getDirectoryStructure().add(folderDict);
+				}
 			}
 		}
 	}
@@ -90,10 +93,6 @@ public class gDriveFiles {
 	/**
 	 * DO folder Processing imply find out its child hierarchy and return as map structure
 	 * 
-	 * @param driveFileRef
-	 * @return
-	 */
-	/**
 	 * @param driveFileRef
 	 * @return
 	 */
@@ -116,7 +115,7 @@ public class gDriveFiles {
 	      try {
 	    	  ChildList children = request.execute();
 	        for (ChildReference child : children.getItems()) {
-	          System.out.println("File Id: " + child.getId());
+	         // System.out.println("File Id: " + child.getId());
 	          //TODO its a costlier call so replace it with something else because at this point we already have this child reference in allfilereference 
 	          File childFileRef = SharedInstances.mDrive.files().get(child.getId()).execute();
 	          
@@ -161,6 +160,29 @@ public class gDriveFiles {
 		return fileDict;
 	}
 
+	public static void printDirectoryStructure() {
+		for(int i = 0; i < mDirectoryStructure.size(); i++) {
+			HashMap<String, Object> content = mDirectoryStructure.get(i);
+			System.out.println(((File)content.get("SELF")).getTitle());
+			if (content.get("CHILD") != null) {
+				//System.out.print("->" +((File)content.get("SELF")).getTitle());
+				childStructure(content.get("CHILD"));
+			}
+		}
+	}
+	
+	private static void childStructure( Object dummyContent) {
+		
+		List<HashMap<String, Object>> childList = (List<HashMap<String, Object>>)dummyContent;
+		for (int childNode = 0 ; childNode < childList.size() ; childNode++) {
+			HashMap<String, Object> content = childList.get(childNode);
+			System.out.println("->"+((File)content.get("SELF")).getTitle());
+			if (content.get("CHILD") != null) {
+				System.out.print("->");
+				childStructure(content.get("CHILD"));
+			}
+		}
+	}
 	/**
 	 * @param mAllFiles the mAllFiles to set
 	 */

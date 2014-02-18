@@ -128,6 +128,11 @@ public class SharedInstances
 	 */
 	public static final String spreadSheetMIMEtype = "application/vnd.google-apps.spreadsheet";
 	
+	/**
+	 * A MIME attachment with the content type "application/octet-stream" is a binary file. Typically, 
+	 * it will be an application or a document that must be opened in an particular application
+	 */
+	public static final String  binaryFileMIMEtype = "application/octet-stream";
 	
     static {
         REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
@@ -147,7 +152,7 @@ public class SharedInstances
 		mUserAutorization = new UserAutorization();
 		mCredential = mUserAutorization.authorize();
 		mDrive = new Drive.Builder(httpTransport, JSON_FACTORY, mCredential).setApplicationName(APPLICATION_NAME).build();
-		gDriveFiles.CacheAllFiles();
+		gDriveFiles.CacheAllFiles();	
     }
     
     static void changeUser() {
