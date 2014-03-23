@@ -40,9 +40,9 @@ public class UserAutorization
 
         try {
             // set up authorization code flow .for more info see documentation
-            GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(SharedInstances.httpTransport, SharedInstances.JSON_FACTORY, SharedInstances.CLIENT_ID, SharedInstances.CLIENT_SECRET,
+            GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(SharedInstances.HTTP_TRANSPORT, SharedInstances.JSON_FACTORY, SharedInstances.CLIENT_ID, SharedInstances.CLIENT_SECRET,
                     Collections.singleton(DriveScopes.DRIVE))
-                    .setDataStoreFactory(SharedInstances.dataStoreFactory).build();
+                    .setDataStoreFactory(SharedInstances.DATA_STORE_FACOTRY).build();
 
             // authorize user credential read from folder(set by us in user folder) else ask for authorization from user on browser and store its credential in local folder
             credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");

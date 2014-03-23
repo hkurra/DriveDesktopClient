@@ -6,11 +6,13 @@ import com.google.api.services.drive.model.File;
 
 
 /**
- * @author harsh
  * 
- *this class going to store File metadata(as like com.google.api.services.drive.model.File) with some extra 
+ * <p>This class going to store File metadata(as like com.google.api.services.drive.model.File) with some extra 
  *metadata need locally before uplaoding or downloading .this class should be a child class of com.google.api.services.drive.model.File; but 
- *as above file is final so have to go this way 
+ *as above file is final so have to go this way </p>
+ *
+ *
+ *  @author harsh
  */
 public class gDriveFile  {
 	

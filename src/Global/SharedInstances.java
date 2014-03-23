@@ -15,6 +15,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.About;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -46,9 +47,13 @@ public class SharedInstances
      */
     public static String REDIRECT_URI;
     /**
+     *  Information about the current user along with Drive API settings
+     */
+    public static About ABOUT ;
+    /**
      * Global instance of resource bundle
      */
-    public static final ResourceBundle myResources;
+    public static final ResourceBundle MY_RESOURCE;
     /**
      * Global instance of directory path which store user credential
      */
@@ -57,11 +62,11 @@ public class SharedInstances
      * Global instance of the {@link DataStoreFactory}. The best practice is to
      * make it a single globally shared instance across your application.
      */
-    public static FileDataStoreFactory dataStoreFactory;
+    public static FileDataStoreFactory DATA_STORE_FACOTRY;
     /**
      * Global instance of the HTTP transport.
      */
-    public static HttpTransport httpTransport;
+    public static HttpTransport HTTP_TRANSPORT;
     /**
      * Global instance of the JSON factory.
      */
@@ -70,78 +75,78 @@ public class SharedInstances
     /**
      * Global instance of the UserCredential on which you are operating
      */
-	public static Credential mCredential;
+	public static Credential CREDENTIAL;
 	
     /**
      * Global instance of the User_Authorization.
      */
-	private static UserAutorization mUserAutorization;
+	private static UserAutorization USER_AUTHORIZATION;
     /**
      * Global instance of the Google Drive on which you are operating
      */
-	public static Drive mDrive;
+	public static Drive DRIVE;
 
 	/**
 	 * folder MIME type string constant
 	 */
-	public static final String folderMIMEtype = "application/vnd.google-apps.folder";
+	public static final String FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 	
 	/**
 	 * document MIME type string constant **google docs**
 	 */
-	public static final String documentMIMEtype = "application/vnd.google-apps.document";
+	public static final String DOCUMENT_MIME_TYPE = "application/vnd.google-apps.document";
 	
 	/**
 	 * audio MIME type string constant
 	 */
-	public static final String audioMIMEtype = "application/vnd.google-apps.audio";
+	public static final String AUDIO_MIME_TYPE = "application/vnd.google-apps.audio";
 	/**
 	 * folder MIME type string constant **google drawing**
 	 */
-	public static final String drawingMIMEtype = "application/vnd.google-apps.drawing";
+	public static final String DRAWING_MIME_TYPE = "application/vnd.google-apps.drawing";
 	/**
 	 * folder MIME type string constant **google file**
 	 */
-	public static final String filerMIMEtype = "application/vnd.google-apps.file";
+	public static final String FILE_MIME_TYPE = "application/vnd.google-apps.file";
 	/**
 	 * form MIME type string constant **google form**
 	 */
-	public static final String formMIMEtype = "application/vnd.google-apps.form";
+	public static final String FORM_MIME_TYPE = "application/vnd.google-apps.form";
 	/**
 	 * photo MIME type string constant
 	 */
-	public static final String photoMIMEtype = "application/vnd.google-apps.photo";
+	public static final String PHOTO_MIME_TYPE = "application/vnd.google-apps.photo";
 	/**
 	 * presentation MIME type string constant   **Google Slides**
 	 */
-	public static final String presentationMIMEtype = "application/vnd.google-apps.presentation";
+	public static final String PRESENTATION_MIME_TYPE = "application/vnd.google-apps.presentation";
 	/**
 	 * unknown MIME type string constant
 	 */
-	public static final String unknownMIMEtype = "application/vnd.google-apps.unknown";
+	public static final String UNKNOWN_MIME_TYPE = "application/vnd.google-apps.unknown";
 	/**
 	 * video MIME type string constant
 	 */
-	public static final String videoMIMEtype = "application/vnd.google-apps.video";
+	public static final String VIDEO_MIME_TYPE = "application/vnd.google-apps.video";
 	/**
 	 * spreadsheet MIME type string constant **google sheet**
 	 */
-	public static final String spreadSheetMIMEtype = "application/vnd.google-apps.spreadsheet";
+	public static final String SPREADSHEET_MIME_TYPE = "application/vnd.google-apps.spreadsheet";
 	
 	/**
 	 * A MIME attachment with the content type "application/octet-stream" is a binary file. Typically, 
 	 * it will be an application or a document that must be opened in an particular application
 	 */
-	public static final String  binaryFileMIMEtype = "application/octet-stream";
+	public static final String  BINARY_FILE_MIME_TYPE = "application/octet-stream";
 	
     static {
         REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
-        myResources = java.util.ResourceBundle.getBundle("resources/Bundle");
+        MY_RESOURCE = java.util.ResourceBundle.getBundle("resources/Bundle");
         JSON_FACTORY = JacksonFactory.getDefaultInstance();
-        DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"), ".store/drive_sample");
+        DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"), MY_RESOURCE.getString("USER_PATH"));
         try {
-            dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
-            httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+            DATA_STORE_FACOTRY = new FileDataStoreFactory(DATA_STORE_DIR);
+            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         } catch (GeneralSecurityException ex) {
             Logger.getLogger(SharedInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -149,9 +154,14 @@ public class SharedInstances
         }
     }
    public static void setUpGDrive() {
-		mUserAutorization = new UserAutorization();
-		mCredential = mUserAutorization.authorize();
-		mDrive = new Drive.Builder(httpTransport, JSON_FACTORY, mCredential).setApplicationName(APPLICATION_NAME).build();
+		USER_AUTHORIZATION = new UserAutorization();
+		CREDENTIAL = USER_AUTHORIZATION.authorize();
+		DRIVE = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, CREDENTIAL).setApplicationName(APPLICATION_NAME).build();
+		try {
+			 ABOUT = DRIVE.about().get().execute();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		gDriveFiles.CacheAllFiles();	
     }
     

@@ -29,6 +29,13 @@ public class gDriveFiles {
 	 */
 	private static List<HashMap<String, Object>> mDirectoryStructure;
 	
+	//STRING CONSTANT AS KEY FOR HASHMAP
+	public final static String SELF_KEY = "SELF";
+	public final static String FILE_ID_KEY = "FILE_ID";
+	public final static String IS_FOLDER_KEY = "IS_FOLDER";
+	public final static String CHILD_KEY = "CHILD";
+	public final static String REVISION = "REVISION";
+	
 	/**
 	 * static block
 	 */
@@ -38,13 +45,13 @@ public class gDriveFiles {
 		setDirectoryStructure(new ArrayList<HashMap<String, Object>>());
 	}
 	/**
-	 * do caching of drive fileS 
-	 * Must Call this method before any file operation and validate current cache 
+	 * </p>do caching of drive files</p> 
+	 * <p>Must Call this method before any file operation and validate current cache</p> 
 	 */
 	public static void CacheAllFiles() {
 		try {
 			getAllFiles().clear();
-			Drive.Files.List list = SharedInstances.mDrive.files().list();
+			Drive.Files.List list = SharedInstances.DRIVE.files().list();
 			 FileList fileList = list.execute();
 			 getAllFiles().addAll(fileList.getItems());
 		} catch (IOException e) {
@@ -99,15 +106,15 @@ public class gDriveFiles {
 	private static HashMap<String, Object> FolderProcessing(File driveFileRef) {
 		
 		HashMap<String, Object> fileDict = new HashMap<String, Object>();
-		fileDict.put("SELF", driveFileRef);
-		fileDict.put("FILE_ID", driveFileRef.getId());
-		fileDict.put("IS_FOLDER", new Boolean(true));
+		fileDict.put(SELF_KEY, driveFileRef);
+		fileDict.put(FILE_ID_KEY, driveFileRef.getId());
+		fileDict.put(IS_FOLDER_KEY, new Boolean(true));
 		
 		
 		List<HashMap<String, Object>> childList = new ArrayList<HashMap<String, Object>>();
 	    Drive.Children.List request = null;
 		try {
-			request = SharedInstances.mDrive.children().list(driveFileRef.getId());
+			request = SharedInstances.DRIVE.children().list(driveFileRef.getId());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -117,7 +124,7 @@ public class gDriveFiles {
 	        for (ChildReference child : children.getItems()) {
 	         // System.out.println("File Id: " + child.getId());
 	          //TODO its a costlier call so replace it with something else because at this point we already have this child reference in allfilereference 
-	          File childFileRef = SharedInstances.mDrive.files().get(child.getId()).execute();
+	          File childFileRef = SharedInstances.DRIVE.files().get(child.getId()).execute();
 	          
 	          //if it is file
 	          if (childFileRef.getFileExtension() != null) {
@@ -139,7 +146,7 @@ public class gDriveFiles {
 	    
 	    if (childList.size() == 0) childList = null;
 	    
-	    fileDict.put("CHILD", childList);
+	    fileDict.put(CHILD_KEY, childList);
 		return fileDict;
 	}
 	
@@ -152,10 +159,10 @@ public class gDriveFiles {
 	private static HashMap<String, Object> FileProcessing(File driveFileRef) {
 		
 		HashMap<String, Object> fileDict = new HashMap<String, Object>();
-		fileDict.put("SELF", driveFileRef);
-		fileDict.put("CHILD", null);
-		fileDict.put("FILE_ID", driveFileRef.getId());
-		fileDict.put("IS_FOLDER", new Boolean(false));
+		fileDict.put(SELF_KEY, driveFileRef);
+		fileDict.put(CHILD_KEY, null);
+		fileDict.put(FILE_ID_KEY, driveFileRef.getId());
+		fileDict.put(IS_FOLDER_KEY, new Boolean(false));
 		
 		return fileDict;
 	}
@@ -163,10 +170,10 @@ public class gDriveFiles {
 	public static void printDirectoryStructure() {
 		for(int i = 0; i < mDirectoryStructure.size(); i++) {
 			HashMap<String, Object> content = mDirectoryStructure.get(i);
-			System.out.println(((File)content.get("SELF")).getTitle());
-			if (content.get("CHILD") != null) {
+			System.out.println(((File)content.get(SELF_KEY)).getTitle());
+			if (content.get(CHILD_KEY) != null) {
 				//System.out.print("->" +((File)content.get("SELF")).getTitle());
-				childStructure(content.get("CHILD"));
+				childStructure(content.get(CHILD_KEY));
 			}
 		}
 	}
@@ -176,13 +183,51 @@ public class gDriveFiles {
 		List<HashMap<String, Object>> childList = (List<HashMap<String, Object>>)dummyContent;
 		for (int childNode = 0 ; childNode < childList.size() ; childNode++) {
 			HashMap<String, Object> content = childList.get(childNode);
-			System.out.println("->"+((File)content.get("SELF")).getTitle());
-			if (content.get("CHILD") != null) {
+			System.out.println("->"+((File)content.get(SELF_KEY)).getTitle());
+			if (content.get(CHILD_KEY) != null) {
 				System.out.print("->");
-				childStructure(content.get("CHILD"));
+				childStructure(content.get(CHILD_KEY));
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * search for fileID within cached files & return match file 
+	 * 
+	 *  <p>if refreshCashing is true this will reread whole Drive(very costlier call
+	 *  so think twice before using it)</p>
+	 *  <p>if serverversion is true it will redirect search call to Google Drive </p>
+	 * 
+	 * @param fileID
+	 * @param refreshCaching
+	 * @param serverVersion
+	 * @return Searched File or null in case file not found 
+	 */
+	static public File searchFileID(String fileID, boolean refreshCaching, boolean serverVersion) {
+		
+		File searchFile = null;
+		if (refreshCaching) {
+			CacheAllFiles();
+		}
+		if (serverVersion) {
+			try {
+				searchFile = SharedInstances.DRIVE.files().get(fileID).execute();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			for (File file : getAllFiles())  {
+				if(file.getId().equals(fileID)) {
+					searchFile =  file;
+					break;
+				}
+			}
+		}
+		return searchFile;
+	}
+	
 	/**
 	 * @param mAllFiles the mAllFiles to set
 	 */
