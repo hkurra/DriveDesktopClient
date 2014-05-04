@@ -1,7 +1,7 @@
 /*
  * Contain error code TODO more exception handling classe as inner class
  */
-package Global;
+package com.gdrive.desktop.client.Global;
 
 
 /**

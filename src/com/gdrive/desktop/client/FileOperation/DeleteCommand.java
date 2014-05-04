@@ -1,10 +1,10 @@
 /**
  * 
  */
-package FileOperation;
+package com.gdrive.desktop.client.FileOperation;
 
-import Global.SharedInstances;
 
+import com.gdrive.desktop.client.Global.SharedInstances;
 import com.google.api.services.drive.model.File;
 
 /**

@@ -3,14 +3,14 @@
  * TODO check MIME TYPE and extension of new file 
  * 
  */
-package FileOperation;
+package com.gdrive.desktop.client.FileOperation;
 
 import java.io.IOException;
 
-import Global.SharedInstances;
 
-import cache.gDriveFiles;
 
+import com.gdrive.desktop.client.Global.SharedInstances;
+import com.gdrive.desktop.client.cache.gDriveFiles;
 import com.google.api.services.drive.model.File;
 
 /**

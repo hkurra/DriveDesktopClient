@@ -2,12 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package Global;
+package com.gdrive.desktop.client.Global;
 
-import Authorization.UserAutorization;
 
-import cache.gDriveFiles;
 
+import com.gdrive.desktop.client.Authorization.UserAutorization;
+import com.gdrive.desktop.client.cache.gDriveFileRevisions;
+import com.gdrive.desktop.client.cache.gDriveFiles;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
@@ -141,7 +142,7 @@ public class SharedInstances
 	
     static {
         REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
-        MY_RESOURCE = java.util.ResourceBundle.getBundle("resources/Bundle");
+        MY_RESOURCE = java.util.ResourceBundle.getBundle("Bundle");
         JSON_FACTORY = JacksonFactory.getDefaultInstance();
         DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"), MY_RESOURCE.getString("USER_PATH"));
         try {
@@ -153,19 +154,29 @@ public class SharedInstances
             Logger.getLogger(SharedInstances.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-   public static void setUpGDrive() {
-		USER_AUTHORIZATION = new UserAutorization();
-		CREDENTIAL = USER_AUTHORIZATION.authorize();
-		DRIVE = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, CREDENTIAL).setApplicationName(APPLICATION_NAME).build();
-		try {
-			 ABOUT = DRIVE.about().get().execute();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		gDriveFiles.CacheAllFiles();	
+   public static Boolean setUpGDrive() {
+	   Boolean isGdriveSetUped = false;
+	   
+	   do {
+			USER_AUTHORIZATION = new UserAutorization();
+			CREDENTIAL = USER_AUTHORIZATION.authorize();
+			DRIVE = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, CREDENTIAL).setApplicationName(APPLICATION_NAME).build();
+			isGdriveSetUped = (DRIVE != null);
+			try {
+				 ABOUT = DRIVE.about().get().execute();
+			} catch (IOException e) {
+				isGdriveSetUped = false;
+				e.printStackTrace();
+				break;
+			}
+			
+			gDriveFiles.CacheAllFiles();
+			gDriveFileRevisions.cacheAllFileRevision();
+	   }while(false);
+		return isGdriveSetUped;
     }
     
-    static void changeUser() {
+    public static void changeUser() {
     	DATA_STORE_DIR.delete();
     	setUpGDrive();
    }

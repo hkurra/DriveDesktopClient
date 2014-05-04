@@ -1,4 +1,4 @@
-package FileOperation;
+package com.gdrive.desktop.client.FileOperation;
 
 public class DownloadCommand extends gCommand {
 
