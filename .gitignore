@@ -238,4 +238,4 @@ dist/README.TXT
 dist/build-impl.xml
 src/resources/client_secrets.json
 src/resources/client_secrets.json
-dist/libs-sources/transaction-api-1.1-sources.jar
+dist/libs-sources/

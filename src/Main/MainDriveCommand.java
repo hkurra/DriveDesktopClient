@@ -12,16 +12,21 @@ package Main;
  * @Include File
  */
 import java.io.IOException;
+import java.util.List;
 
+import com.gdrive.desktop.client.FileOperation.CopyCommand;
+import com.gdrive.desktop.client.FileOperation.UploadCommand;
+import com.gdrive.desktop.client.FileOperation.gCommand;
+import com.gdrive.desktop.client.FileOperation.UploadCommand.UploadOperation;
+import com.gdrive.desktop.client.Global.SharedInstances;
+import com.gdrive.desktop.client.cache.gDriveFile;
+import com.gdrive.desktop.client.cache.gDriveFileRevisions;
+import com.gdrive.desktop.client.cache.gDriveFiles;
+import com.google.api.client.googleapis.media.MediaHttpUploader.UploadState;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.Revision;
 
-import cache.gDriveFile;
-import cache.gDriveFiles;
-import FileOperation.CopyCommand;
-import FileOperation.UploadCommand;
-import FileOperation.gCommand;
-import Global.SharedInstances;
 
 
 public class MainDriveCommand {
@@ -33,14 +38,18 @@ public class MainDriveCommand {
      */
     public static void main(String[] args) throws IOException {
         
-        assert(args.length == 3 || !args[0].isEmpty() || !args[1].isEmpty() || !args[2].isEmpty()):"Invalid argument";
+       // assert(args.length == 3 || !args[0].isEmpty() || !args[1].isEmpty() || !args[2].isEmpty()):"Invalid argument";
         
-        SharedInstances.CLIENT_ID = args[0];
-        SharedInstances.CLIENT_SECRET = args[1];
-        SharedInstances.APPLICATION_NAME = args[2];
+//        SharedInstances.CLIENT_ID = args[0];
+//        SharedInstances.CLIENT_SECRET = args[1];
+//        SharedInstances.APPLICATION_NAME = args[2];
+        
+        SharedInstances.CLIENT_ID = "882577327525.apps.googleusercontent.com";
+        SharedInstances.CLIENT_SECRET = "06DR_ebCYtPCpGo4RhCjD4_2";
+        SharedInstances.APPLICATION_NAME = "First_UI _testing";
   
-        SharedInstances.setUpGDrive();
-        if (SharedInstances.CREDENTIAL != null){
+        
+        if (SharedInstances.setUpGDrive()){
         	System.out.println(SharedInstances.MY_RESOURCE.getString("SUCCESS_AUTHORIZATION_MSSG"));
         }
         System.out.println("***************************************************");
@@ -51,14 +60,14 @@ public class MainDriveCommand {
          * Uploading file in root directory of drive
          */
 //        gDriveFile fileMetadata = new gDriveFile("F:/CheckGDrive/check.txt", null);
-//        gCommand gCmd = new UploadCommand(fileMetadata, false);
+//        gCommand gCmd = new UploadCommand(fileMetadata, UploadOperation.NEW_UPLOAD);
 //        gCmd.DoExcute();
         
         /*
          * uploading folder in root directory of drive
          */
 //        gDriveFile fileMetadata1 = new gDriveFile("folder34", null);
-//        gCommand gCmd1 = new UploadCommand(fileMetadata1, false);
+//        gCommand gCmd1 = new UploadCommand(fileMetadata1, UploadOperation.NEW_UPLOAD);
 //        gCmd1.DoExcute();
         
         
@@ -68,10 +77,33 @@ public class MainDriveCommand {
 //        File searchFile = gDriveFiles.searchFileID("0Bx5XsDaBgWSKV1pEdnpVdnVFZ3M", false, false);
 //        searchFile.setTitle("updatedFile");
 //        gDriveFile fileMetadata = new gDriveFile("F:/CheckGDrive/check2.pdf", searchFile );
-//        gCommand gCmd = new UploadCommand(fileMetadata, true);
+//        gCommand gCmd = new UploadCommand(fileMetadata, UploadOperation.NEW_REVISION);
 //        gCmd.DoExcute();
         
-        
+        /*
+         * testing 
+         */
+//        List<Revision>  fileRevisions = gDriveFileRevisions.searchFileRevisionsByID("0Bx5XsDaBgWSKV1pEdnpVdnVFZ3M", false, true);
+//        for (Revision fileRevision: fileRevisions) {
+//        	if (fileRevision.getOriginalFilename().equals("hgh.indd")) {
+//        		fileRevision.setLastModifyingUserName("mai hun don");
+//        		fileRevision.setOriginalFilename("dddfdsfgdfg");
+//        		if (fileRevision.getPinned() == true ) {
+//        			fileRevision.setPinned(false);
+//        		}
+//        		SharedInstances.DRIVE.revisions().patch("0Bx5XsDaBgWSKV1pEdnpVdnVFZ3M", fileRevision.getId(), fileRevision).execute();
+//        	}
+//        }
+//        try {
+//            // First retrieve the revision from the API.
+//            Revision revision = service.revisions().get(
+//                fileId, revisionId).execute();
+//            revision.setPinned(true);
+//            return service.revisions().update(
+//                fileId, revisionId, revision).execute();
+//          } catch (IOException e) {
+//            System.out.println("An error occurred: " + e);
+//          }
         
         /*
          * for uploading file/folder in any directory add parent id in second parameter of upload command

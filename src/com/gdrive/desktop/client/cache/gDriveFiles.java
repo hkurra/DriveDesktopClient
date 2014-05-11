@@ -108,9 +108,13 @@ public class gDriveFiles {
 			.getParents();
 
 			// if it is a file/folder under default(MyDrive) directory
-			if (parentList.size() != 0 && parentList.get(0).getIsRoot()) {
+			if (!parentList.isEmpty() && parentList.get(0).getIsRoot()) {
 				// if it is file
-				if (getAllFiles().get(index).getFileExtension() != null) {
+				File currentFile = getAllFiles().get(index);
+				if (currentFile.getFileExtension() != null) {
+					if (currentFile.getExplicitlyTrashed() != null && currentFile.getExplicitlyTrashed()) {
+						continue;
+					}
 					getDirectoryStructure().add(
 							FileProcessing(getAllFiles().get(index)));
 				}
