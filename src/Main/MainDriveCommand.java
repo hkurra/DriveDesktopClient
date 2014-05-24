@@ -38,18 +38,14 @@ public class MainDriveCommand {
      */
     public static void main(String[] args) throws IOException {
         
-       // assert(args.length == 3 || !args[0].isEmpty() || !args[1].isEmpty() || !args[2].isEmpty()):"Invalid argument";
+        assert(args.length == 3 || !args[0].isEmpty() || !args[1].isEmpty() || !args[2].isEmpty()):"Invalid argument";
         
-//        SharedInstances.CLIENT_ID = args[0];
-//        SharedInstances.CLIENT_SECRET = args[1];
-//        SharedInstances.APPLICATION_NAME = args[2];
+        SharedInstances.CLIENT_ID = args[0];
+        SharedInstances.CLIENT_SECRET = args[1];
+           SharedInstances.APPLICATION_NAME = args[2];
         
-        SharedInstances.CLIENT_ID = "882577327525.apps.googleusercontent.com";
-        SharedInstances.CLIENT_SECRET = "06DR_ebCYtPCpGo4RhCjD4_2";
-        SharedInstances.APPLICATION_NAME = "First_UI _testing";
-  
-        
-        if (SharedInstances.setUpGDrive()){
+
+         if (SharedInstances.setUpGDrive()){
         	System.out.println(SharedInstances.MY_RESOURCE.getString("SUCCESS_AUTHORIZATION_MSSG"));
         }
         System.out.println("***************************************************");
