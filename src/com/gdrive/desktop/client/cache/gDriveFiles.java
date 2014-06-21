@@ -8,6 +8,7 @@ package com.gdrive.desktop.client.cache;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.gdrive.desktop.client.Global.SharedInstances;
@@ -18,271 +19,263 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.ParentReference;
 
-public class GDriveFiles {
-	/**
-	 * cache copy of drive files
-	 */
-	private static List<File> mAllFiles;
-	/**
-	 * directory structure of Files of Drive
-	 */
-	private static List<TreeNodeInfo> mDirectoryStructure;
 
-	// STRING CONSTANT AS KEY FOR HASHMAP
-	public final static String SELF_KEY = "SELF";
-	public final static String FILE_ID_KEY = "FILE_ID";
-	public final static String IS_FOLDER_KEY = "IS_FOLDER";
-	public final static String CHILD_KEY = "CHILD";
-	public final static String REVISION = "REVISION";
+public class GDriveFiles
+{
+  private static List<File> mAllFiles;
+  private static List<TreeNodeInfo> mDirectoryStructure;
+  private static List<TreeNodeInfo> mMyDriveDirectoryStructure;
+  private static List<TreeNodeInfo> mTrashedDirectoryStructure;
+  private static TreeNodeInfo mMyDriveRootNode ;
+  private static TreeNodeInfo mTrashedRootNode ;
+  private static HashMap<String, TreeNodeInfo> mAllFileTreeNodeInfo;
+  public static final String SELF_KEY = "SELF";
+  public static final String FILE_ID_KEY = "FILE_ID";
+  public static final String IS_FOLDER_KEY = "IS_FOLDER";
+  public static final String CHILD_KEY = "CHILD";
+  public static final String REVISION = "REVISION";
 
-	/**
-	 * static block
-	 */
-	static {
-		setAllFiles(new ArrayList<File>());
-		setDirectoryStructure(new ArrayList<TreeNodeInfo>());
-	}
+  static
+  {
+	  mAllFileTreeNodeInfo = new HashMap<String, TreeNodeInfo>();
+	  mMyDriveRootNode = createDummyNode("Drive", true);
+	  mTrashedRootNode = createDummyNode("Trashed", true);
+    setMyDriveDirectoryStructure(new ArrayList<TreeNodeInfo>());
+    setTrashedDirectoryStructure(new ArrayList<TreeNodeInfo>());
+    setAllFiles(new ArrayList<File>());
+    setDirectoryStructure(new ArrayList<TreeNodeInfo>());
+  }
 
-	/**
-	 * </p>do caching of drive files</p>
-	 * <p>
-	 * Must Call this method before any file operation and validate current
-	 * cache
-	 * </p>
-	 * <p>
-	 * its your responsibility to cache old copy of structure in case of failure
-	 * of refreshing this caching always maintain fresh structure until you
-	 * refresh
-	 * </p>
-	 */
-	public static void CacheAllFiles() {
-		try {
-			getAllFiles().clear();
-			final Drive.Files.List list = SharedInstances.DRIVE.files().list();
-			final FileList fileList = list.execute();
-			getAllFiles().addAll(fileList.getItems());
-		} catch (final IOException e) {
-			e.printStackTrace();
-			getAllFiles().clear();
-		} catch (final Exception e) {
-			e.printStackTrace();
-			getAllFiles().clear();
-		} finally {
-			// (TODO need testing)in case of failure or refresh we have to clear
-			// this structure otherwise it lead to wrong information
-			// so its your responsibility to cache old copy of structure in case
-			// of failure of refreshing
-			// this caching always maintain fresh structure until you refresh
-			getDirectoryStructure().clear();
-		}
-		CreateDirectoryStructure();
-		
-		printDirectoryStructure();
-	}
+  public static void CacheAllFiles()
+  {
+    try
+    {
+      getAllFiles().clear();
+      Drive.Files.List list = SharedInstances.DRIVE.files().list();
+      FileList fileList = (FileList)list.execute();
+      getAllFiles().addAll(fileList.getItems());
+    } catch (IOException e) {
+      e.printStackTrace();
+      getAllFiles().clear();
+    } catch (Exception e) {
+      e.printStackTrace();
+      getAllFiles().clear();
+    }
+    finally
+    {
+      getDirectoryStructure().clear();
+    }
+    CreateDirectoryStructure();
 
-	private static void childStructure(final Object dummyContent) {
+    mMyDriveRootNode.put("CHILD", getMyDriveDirectoryStructure());
+    mTrashedRootNode.put("CHILD", getTrashedDirectoryStructure());
+    getDirectoryStructure().add(mMyDriveRootNode);
+    getDirectoryStructure().add(mTrashedRootNode);
 
-		final List<TreeNodeInfo> childList = (List<TreeNodeInfo>) dummyContent;
-		for (int childNode = 0; childNode < childList.size(); childNode++) {
-			final TreeNodeInfo content = childList.get(childNode);
-			System.out
-			.println("->" + ((File) content.get(SELF_KEY)).getTitle());
-			if (content.get(CHILD_KEY) != null) {
-				System.out.print("->");
-				childStructure(content.get(CHILD_KEY));
-			}
-		}
-	}
+    printDirectoryStructure();
+  }
 
-	/**
-	 * replicate and cache google Drive current directory structure must call
-	 * this to refresh UI
-	 */
-	// TODO 9/feb/14 write now i know only this way to implement may be some API
-	// already there
-	// TODO NEED TO HANDLE CASE OF FILE UNDER MULTIPLE FOLDER AND FILE UNDER
-	// TRASH and shared with me FoLDER
-	private static void CreateDirectoryStructure() {
-		for (int index = 0; index < getAllFiles().size(); index++) {
-			final List<ParentReference> parentList = getAllFiles().get(index)
-			.getParents();
+  private static void childStructure(Object dummyContent)
+  {
+	  final List<TreeNodeInfo> childList = (List<TreeNodeInfo>) dummyContent;
+    for (int childNode = 0; childNode < childList.size(); childNode++) {
+      TreeNodeInfo content = (TreeNodeInfo)childList.get(childNode);
+      System.out
+        .println("->" + ((File)content.get("SELF")).getTitle());
+      if (content.get("CHILD") != null) {
+        System.out.print("->");
+        childStructure(content.get("CHILD"));
+      }
+    }
+  }
 
-			// if it is a file/folder under default(MyDrive) directory
-			if (!parentList.isEmpty() && parentList.get(0).getIsRoot()) {
-				// if it is file
-				File currentFile = getAllFiles().get(index);
-				if (currentFile.getFileExtension() != null) {
-					if (currentFile.getExplicitlyTrashed() != null && currentFile.getExplicitlyTrashed()) {
-						continue;
-					}
-					getDirectoryStructure().add(
-							FileProcessing(getAllFiles().get(index)));
-				}
-				// if it is folder
-				else if (getAllFiles().get(index).getFileExtension() == null) {
-					final TreeNodeInfo folderDict = FolderProcessing(getAllFiles()
-							.get(index));
-					getDirectoryStructure().add(folderDict);
-				}
-			}
-		}
-	}
+  private static void CreateDirectoryStructure()
+  {
+    for (int index = 0; index < getAllFiles().size(); index++) {
+      List<ParentReference> parentList = ((File)getAllFiles().get(index))
+        .getParents();
+      File currentFile = (File)getAllFiles().get(index);
 
-	/**
-	 * Do file Processing
-	 * 
-	 * @param driveFileRef
-	 * @return TreeNodeInfo
-	 */
-	private static TreeNodeInfo FileProcessing(final File driveFileRef) {
+      if ((parentList.isEmpty()) || (!((ParentReference)parentList.get(0)).getIsRoot().booleanValue()))
+        continue;
+      if (((File)getAllFiles().get(index)).getMimeType().equals("application/vnd.google-apps.folder"))
+      {
+        if ((currentFile.getExplicitlyTrashed() != null) && (currentFile.getExplicitlyTrashed().booleanValue())) {
+          getTrashedDirectoryStructure().add(FolderProcessing(
+            (File)getAllFiles()
+            .get(index)));
+        }
+        else {
+          getMyDriveDirectoryStructure().add(FolderProcessing(
+            (File)getAllFiles()
+            .get(index)));
+        }
 
-		final TreeNodeInfo fileDict = new TreeNodeInfo();
-		fileDict.put(SELF_KEY, driveFileRef);
-		fileDict.put(CHILD_KEY, null);
-		fileDict.put(FILE_ID_KEY, driveFileRef.getId());
-		fileDict.put(IS_FOLDER_KEY, new Boolean(false));
+      }
+      else if ((currentFile.getExplicitlyTrashed() != null) && (currentFile.getExplicitlyTrashed().booleanValue())) {
+        getTrashedDirectoryStructure().add(FileProcessing((File)getAllFiles().get(index)));
+      }
+      else
+        getMyDriveDirectoryStructure().add(
+          FileProcessing((File)getAllFiles().get(index)));
+    }
+  }
 
-		return fileDict;
-	}
+  public static TreeNodeInfo FileProcessing(File driveFileRef)
+  {
+    TreeNodeInfo treeNodeInfo = new TreeNodeInfo();
+    treeNodeInfo.put("SELF", driveFileRef);
+    treeNodeInfo.put("CHILD", null);
+    treeNodeInfo.put("FILE_ID", driveFileRef.getId());
+    treeNodeInfo.put("IS_FOLDER", new Boolean(false));
 
-	/**
-	 * DO folder Processing imply find out its child hierarchy and return as map
-	 * structure
-	 * 
-	 * @param driveFileRef
-	 * @return
-	 */
-	private static TreeNodeInfo FolderProcessing(final File driveFileRef) {
+    mAllFileTreeNodeInfo.put(driveFileRef.getId(), treeNodeInfo);
+    return treeNodeInfo;
+  }
 
-		final TreeNodeInfo treeNodeInfo = new TreeNodeInfo();
-		treeNodeInfo.put(SELF_KEY, driveFileRef);
-		treeNodeInfo.put(FILE_ID_KEY, driveFileRef.getId());
-		treeNodeInfo.put(IS_FOLDER_KEY, new Boolean(true));
+  private static TreeNodeInfo FolderProcessing(File driveFileRef)
+  {
+    TreeNodeInfo treeNodeInfo = new TreeNodeInfo();
+    treeNodeInfo.put("SELF", driveFileRef);
+    treeNodeInfo.put("FILE_ID", driveFileRef.getId());
+    treeNodeInfo.put("IS_FOLDER", new Boolean(true));
 
-		List<TreeNodeInfo> childList = new ArrayList<TreeNodeInfo>();
-		Drive.Children.List request = null;
-		try {
-			request = SharedInstances.DRIVE.children().list(
-					driveFileRef.getId());
-		} catch (final IOException e1) {
-			e1.printStackTrace();
-		}
-		do {
-			try {
-				final ChildList children = request.execute();
-				for (final ChildReference child : children.getItems()) {
+    List<TreeNodeInfo> childList = new ArrayList<TreeNodeInfo>();
+    Drive.Children.List request = null;
+    try {
+      request = SharedInstances.DRIVE.children().list(
+        driveFileRef.getId());
+    } catch (IOException e1) {
+      e1.printStackTrace();
+    }
+    do
+      try {
+        ChildList children = (ChildList)request.execute();
+        for (ChildReference child : children.getItems())
+        {
+          File childFileRef = searchFileID(child.getId(), 
+            false, false);
 
-					final File childFileRef = searchFileID(child.getId(),
-							false, false);
+          Boolean isParentTrashed = Boolean.valueOf((driveFileRef.getExplicitlyTrashed() != null) && (driveFileRef.getExplicitlyTrashed().booleanValue()));
+          Boolean isFileTrashded = Boolean.valueOf((childFileRef.getExplicitlyTrashed() != null) && (childFileRef.getExplicitlyTrashed().booleanValue()));
 
-					// if it is file
-					if (childFileRef.getFileExtension() != null) {
-						childList.add(FileProcessing(childFileRef));
-					}
+          Boolean isFallUnderTrashedDirStruct = Boolean.valueOf((!isParentTrashed.booleanValue()) && (isFileTrashded.booleanValue()));
+          boolean testVar;
+          if (childFileRef.getMimeType().equals("application/vnd.google-apps.folder")) {
+            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(FolderProcessing(childFileRef)) : childList.add(FolderProcessing(childFileRef));
+          }
+          else
+          {
+            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(FileProcessing(childFileRef)) : childList.add(FileProcessing(childFileRef));
+          }
+        }
+        request.setPageToken(children.getNextPageToken());
+      } catch (IOException e) {
+        System.out.println("An error occurred: " + e);
+        request.setPageToken(null);
+      }
+    while ((request.getPageToken() != null) && 
+      (request.getPageToken().length() > 0));
 
-					// if it is folder
-					else if (childFileRef.getFileExtension() == null) {
-						childList.add(FolderProcessing(childFileRef));
-					}
-				}
-				request.setPageToken(children.getNextPageToken());
-			} catch (final IOException e) {
-				System.out.println("An error occurred: " + e);
-				request.setPageToken(null);
-			}
-		} while (request.getPageToken() != null
-				&& request.getPageToken().length() > 0);
+    if (childList.size() == 0) {
+      childList.add(createDummyNode("Empty", false));
+    }
+    treeNodeInfo.put("CHILD", childList);
 
-		if (childList.size() == 0)
-			childList = null;
+    mAllFileTreeNodeInfo.put(driveFileRef.getId(), treeNodeInfo);
+    return treeNodeInfo;
+  }
 
-		treeNodeInfo.put(CHILD_KEY, childList);
-		return treeNodeInfo;
-	}
+  public static List<File> getAllFiles()
+  {
+    return mAllFiles;
+  }
 
-	/**
-	 * @return the mAllFiles
-	 */
-	public static List<File> getAllFiles() {
-		return mAllFiles;
-	}
+  public static List<TreeNodeInfo> getDirectoryStructure()
+  {
+    return mDirectoryStructure;
+  }
 
-	/**
-	 * @return the mDirectoryStructure
-	 */
-	public static List<TreeNodeInfo> getDirectoryStructure() {
-		return mDirectoryStructure;
-	}
+  private static void printDirectoryStructure() {
+    for (int i = 0; i < getDirectoryStructure().size(); i++) {
+      TreeNodeInfo content = (TreeNodeInfo)getDirectoryStructure().get(i);
+      System.out.println(((File)content.get("SELF")).getTitle());
+      if (content.get("CHILD") == null) {
+        continue;
+      }
+      childStructure(content.get("CHILD"));
+    }
+  }
 
-	private static void printDirectoryStructure() {
-		for (int i = 0; i < mDirectoryStructure.size(); i++) {
-			final TreeNodeInfo content = mDirectoryStructure.get(i);
-			System.out.println(((File) content.get(SELF_KEY)).getTitle());
-			if (content.get(CHILD_KEY) != null) {
-				// System.out.print("->"
-				// +((File)content.get("SELF")).getTitle());
-				childStructure(content.get(CHILD_KEY));
-			}
-		}
-	}
+  public static File searchFileID(String fileID, boolean refreshCaching, boolean serverVersion)
+  {
+    File searchFile = null;
+    if (refreshCaching) {
+      CacheAllFiles();
+    }
+    if (serverVersion)
+      try {
+        searchFile = 
+          (File)SharedInstances.DRIVE.files().get(fileID)
+          .execute();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    else {
+      for (File file : getAllFiles()) {
+        if (file.getId().equals(fileID)) {
+          searchFile = file;
+          break;
+        }
+      }
+    }
+    return searchFile;
+  }
 
-	/**
-	 * 
-	 * search for fileID within cached files & return match file
-	 * 
-	 * <p>
-	 * if refreshCashing is true this will reread whole Drive(very costlier call
-	 * so think twice before using it)
-	 * </p>
-	 * <p>
-	 * if serverversion is true it will redirect search call to Google Drive
-	 * </p>
-	 * 
-	 * @param fileID
-	 * @param refreshCaching
-	 * @param serverVersion
-	 * @return Searched File or null in case file not found
-	 */
-	static public File searchFileID(final String fileID,
-			final boolean refreshCaching, final boolean serverVersion) {
+  public static TreeNodeInfo getFileTreeNodeInfo(String fileId)
+  {
+    return (TreeNodeInfo)mAllFileTreeNodeInfo.get(fileId);
+  }
 
-		File searchFile = null;
-		if (refreshCaching) {
-			CacheAllFiles();
-		}
-		if (serverVersion) {
-			try {
-				searchFile = SharedInstances.DRIVE.files().get(fileID)
-				.execute();
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			for (final File file : getAllFiles()) {
-				if (file.getId().equals(fileID)) {
-					searchFile = file;
-					break;
-				}
-			}
-		}
-		return searchFile;
-	}
+  private static void setAllFiles(List<File> allFiles)
+  {
+    mAllFiles = allFiles;
+  }
 
-	/**
-	 * @param mAllFiles
-	 *            the mAllFiles to set
-	 */
-	private static void setAllFiles(final List<File> mAllFiles) {
-		GDriveFiles.mAllFiles = mAllFiles;
-	}
+  public static void setDirectoryStructure(List<TreeNodeInfo> directoryStructure)
+  {
+    mDirectoryStructure = directoryStructure;
+  }
+  private static TreeNodeInfo createDummyNode(String rootNodename, boolean isFolder) {
+    TreeNodeInfo rootNode = new TreeNodeInfo();
+    File rootNodeDummyFile = new File();
 
-	/**
-	 * @param mDirectoryStructure
-	 *            the mDirectoryStructure to set
-	 */
-	public static void setDirectoryStructure(
-			final List<TreeNodeInfo> mDirectoryStructure) {
-		GDriveFiles.mDirectoryStructure = mDirectoryStructure;
-	}
+    rootNodeDummyFile.setTitle(rootNodename);
+    rootNodeDummyFile.setId("-1");
+    rootNode.put("SELF", rootNodeDummyFile);
+    rootNode.put("FILE_ID", rootNodeDummyFile.getId());
+    rootNode.put("IS_FOLDER", new Boolean(isFolder));
 
+    return rootNode;
+  }
+
+  public static void setMyDriveDirectoryStructure(List<TreeNodeInfo> myDriveDirectoryStructure)
+  {
+    mMyDriveDirectoryStructure = myDriveDirectoryStructure;
+  }
+
+  public static List<TreeNodeInfo> getMyDriveDirectoryStructure()
+  {
+    return mMyDriveDirectoryStructure;
+  }
+
+  public static void setTrashedDirectoryStructure(List<TreeNodeInfo> trashedDirectoryStructure)
+  {
+    mTrashedDirectoryStructure = trashedDirectoryStructure;
+  }
+
+  public static List<TreeNodeInfo> getTrashedDirectoryStructure()
+  {
+    return mTrashedDirectoryStructure;
+  }
 }

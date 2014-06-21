@@ -25,14 +25,14 @@ public class GDriveFileRevisions {
 			for (final File file : allFile) {
 
 				getAllFileRevision().put(file.getId(),
-						getFileRevision(file.getId()));
+						getFileRevisionFromServer(file.getId()));
 			}
 		} catch (final Exception e) {
 			getAllFileRevision().clear();
 		}
 	}
 
-	private static List<Revision> getFileRevision(final String fileID)
+	private static List<Revision> getFileRevisionFromServer(final String fileID)
 			throws Exception {
 
 		try {
@@ -44,10 +44,11 @@ public class GDriveFileRevisions {
 		}
 	}
 
-	public void updateFileRevision(final String fileID) {
+	  
+	public static void updateFileRevision(final String fileID) {
 
 		try {
-			getAllFileRevision().put(fileID, getFileRevision(fileID));
+			getAllFileRevision().put(fileID, getFileRevisionFromServer(fileID));
 		} catch (final Exception e) {
 
 		}
@@ -96,6 +97,9 @@ public class GDriveFileRevisions {
 		return fileRevisions;
 	}
 
+	  public static List<Revision> getFileRevision(String fileID) {
+		    return searchFileRevisionsByID(fileID, false, false);
+		  }
 	/**
 	 * @return the mAllFileRevision
 	 */

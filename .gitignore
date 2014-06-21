@@ -239,3 +239,4 @@ dist/build-impl.xml
 src/resources/client_secrets.json
 src/resources/client_secrets.json
 dist/libs-sources/
+Desktopclient.jar
