@@ -10,14 +10,14 @@ import java.io.IOException;
 
 
 import com.gdrive.desktop.client.Global.SharedInstances;
-import com.gdrive.desktop.client.cache.gDriveFiles;
+import com.gdrive.desktop.client.cache.GDriveFiles;
 import com.google.api.services.drive.model.File;
 
 /**
  * @author harsh
  *
  */
-public class CopyCommand extends gCommand {
+public class CopyCommand extends ICommand {
 
 	/**
 	 * file ID of file to be copied
@@ -51,7 +51,7 @@ public class CopyCommand extends gCommand {
 	@Override
 	protected int PreExecute() {
 		
-		String defaultTitle =  gDriveFiles.searchFileID(mOrigionFileId, false, false).getTitle();
+		String defaultTitle =  GDriveFiles.searchFileID(mOrigionFileId, false, false).getTitle();
 	
 		if (mCopiedFile == null) {
 			mCopiedFile = new File();

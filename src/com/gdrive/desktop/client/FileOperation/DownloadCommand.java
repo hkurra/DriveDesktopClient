@@ -1,6 +1,6 @@
 package com.gdrive.desktop.client.FileOperation;
 
-public class DownloadCommand extends gCommand {
+public class DownloadCommand extends ICommand {
 
 	@Override
 	public Boolean IsExecutable() {

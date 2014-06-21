@@ -16,12 +16,12 @@ import java.util.List;
 
 import com.gdrive.desktop.client.FileOperation.CopyCommand;
 import com.gdrive.desktop.client.FileOperation.UploadCommand;
-import com.gdrive.desktop.client.FileOperation.gCommand;
+import com.gdrive.desktop.client.FileOperation.ICommand;
 import com.gdrive.desktop.client.FileOperation.UploadCommand.UploadOperation;
 import com.gdrive.desktop.client.Global.SharedInstances;
-import com.gdrive.desktop.client.cache.gDriveFile;
-import com.gdrive.desktop.client.cache.gDriveFileRevisions;
-import com.gdrive.desktop.client.cache.gDriveFiles;
+import com.gdrive.desktop.client.cache.GDriveFile;
+import com.gdrive.desktop.client.cache.GDriveFileRevisions;
+import com.gdrive.desktop.client.cache.GDriveFiles;
 import com.google.api.client.googleapis.media.MediaHttpUploader.UploadState;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.model.File;

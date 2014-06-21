@@ -13,7 +13,7 @@ import com.google.api.services.drive.model.File;
  * <p>Command To delete/Trash File from Google drive</p>
  *
  */
-public class DeleteCommand extends gCommand {
+public class DeleteCommand extends ICommand {
 
 	/**
 	 * Fileid of file to be delete

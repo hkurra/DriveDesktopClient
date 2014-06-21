@@ -15,7 +15,7 @@ import com.google.api.services.drive.model.File;
  * 
  * @author harsh
  */
-public class gDriveFile {
+public class GDriveFile {
 
 	private String mFilePath;
 
@@ -43,7 +43,7 @@ public class gDriveFile {
 	 * @param filePath
 	 * @param driveFile
 	 */
-	public gDriveFile(final String filePath, final File driveFile) {
+	public GDriveFile(final String filePath, final File driveFile) {
 		if (driveFile != null)
 			setDFile(driveFile);
 		if (filePath != null)

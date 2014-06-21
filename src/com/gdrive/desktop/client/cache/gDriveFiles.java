@@ -18,7 +18,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.ParentReference;
 
-public class gDriveFiles {
+public class GDriveFiles {
 	/**
 	 * cache copy of drive files
 	 */
@@ -273,7 +273,7 @@ public class gDriveFiles {
 	 *            the mAllFiles to set
 	 */
 	private static void setAllFiles(final List<File> mAllFiles) {
-		gDriveFiles.mAllFiles = mAllFiles;
+		GDriveFiles.mAllFiles = mAllFiles;
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class gDriveFiles {
 	 */
 	public static void setDirectoryStructure(
 			final List<TreeNodeInfo> mDirectoryStructure) {
-		gDriveFiles.mDirectoryStructure = mDirectoryStructure;
+		GDriveFiles.mDirectoryStructure = mDirectoryStructure;
 	}
 
 }

@@ -13,7 +13,7 @@ import com.gdrive.desktop.client.Global.ServiceManager;
 import com.gdrive.desktop.client.Global.SharedInstances;
 import com.gdrive.desktop.client.Global.ResponderData.AfterFileUploadRespoderData;
 import com.gdrive.desktop.client.Global.ResponderData.BeforeFileUploadResponderData;
-import com.gdrive.desktop.client.cache.gDriveFile;
+import com.gdrive.desktop.client.cache.GDriveFile;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -24,7 +24,7 @@ import com.google.api.services.drive.model.ParentReference;
  * @author harsh
  */
 
-public class UploadCommand extends gCommand {
+public class UploadCommand extends ICommand {
 
 	public static enum UploadOperation {
 		NEW_REVISION, PATCH, TOUCH, NEW_UPLOAD
@@ -64,7 +64,7 @@ public class UploadCommand extends gCommand {
 	/**
 	 * local variant of Drive file class (for setting metadata)
 	 */
-	private gDriveFile mGDriveFile = null;
+	private GDriveFile mGDriveFile = null;
 
 	/**
 	 * represent local disk file
@@ -86,7 +86,7 @@ public class UploadCommand extends gCommand {
 	 * 
 	 * @param gDrivefile
 	 */
-	public UploadCommand(gDriveFile gDrivefile, UploadOperation isUpdatefile) {
+	public UploadCommand(GDriveFile gDrivefile, UploadOperation isUpdatefile) {
 		setUploadOperation(isUpdatefile);
 		Init(gDrivefile);
 	}
@@ -97,7 +97,7 @@ public class UploadCommand extends gCommand {
 	 * @param gDrivefile
 	 * @param parentID
 	 */
-	public UploadCommand(gDriveFile gDrivefile, String parentID) {
+	public UploadCommand(GDriveFile gDrivefile, String parentID) {
 		Init(gDrivefile);
 		mParentID = parentID;
 		setUploadOperation(UploadOperation.NEW_UPLOAD);
@@ -108,7 +108,7 @@ public class UploadCommand extends gCommand {
 	 * 
 	 * @param gDrivefile
 	 */
-	private void Init(gDriveFile gDrivefile) {
+	private void Init(GDriveFile gDrivefile) {
 		setGDriveFile(gDrivefile);
 		setDeleteFile(getGDriveFile().getDelateFile());
 		setFolder(getGDriveFile().isFolder());
@@ -309,14 +309,14 @@ public class UploadCommand extends gCommand {
 	/**
 	 * @param mGDriveFile the mGDriveFile to set
 	 */
-	public void setGDriveFile(gDriveFile mGDriveFile) {
+	public void setGDriveFile(GDriveFile mGDriveFile) {
 		this.mGDriveFile = mGDriveFile;
 	}
 
 	/**
 	 * @return the mGDriveFile
 	 */
-	public gDriveFile getGDriveFile() {
+	public GDriveFile getGDriveFile() {
 		return mGDriveFile;
 	}
 

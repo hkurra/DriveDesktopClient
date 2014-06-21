@@ -10,7 +10,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Revision;
 import com.google.api.services.drive.model.RevisionList;
 
-public class gDriveFileRevisions {
+public class GDriveFileRevisions {
 
 	private static HashMap<String, List<Revision>> mAllFileRevision;
 
@@ -19,7 +19,7 @@ public class gDriveFileRevisions {
 	}
 
 	public static void cacheAllFileRevision() {
-		final List<File> allFile = gDriveFiles.getAllFiles();
+		final List<File> allFile = GDriveFiles.getAllFiles();
 		getAllFileRevision().clear();
 		try {
 			for (final File file : allFile) {

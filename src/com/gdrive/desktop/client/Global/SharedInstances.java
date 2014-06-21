@@ -7,8 +7,8 @@ package com.gdrive.desktop.client.Global;
 
 
 import com.gdrive.desktop.client.Authorization.UserAutorization;
-import com.gdrive.desktop.client.cache.gDriveFileRevisions;
-import com.gdrive.desktop.client.cache.gDriveFiles;
+import com.gdrive.desktop.client.cache.GDriveFileRevisions;
+import com.gdrive.desktop.client.cache.GDriveFiles;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
@@ -170,8 +170,8 @@ public class SharedInstances
 				break;
 			}
 			
-			gDriveFiles.CacheAllFiles();
-			gDriveFileRevisions.cacheAllFileRevision();
+			GDriveFiles.CacheAllFiles();
+			GDriveFileRevisions.cacheAllFileRevision();
 	   }while(false);
 		return isGdriveSetUped;
     }
