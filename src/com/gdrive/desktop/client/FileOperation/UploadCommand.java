@@ -6,8 +6,11 @@ package com.gdrive.desktop.client.FileOperation;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.rmi.server.SocketSecurityException;
 import java.util.Arrays;
 import java.util.List;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.nio.file.Files;
 
 import javax.swing.tree.TreePath;
@@ -91,7 +94,7 @@ public class UploadCommand extends ICommand
       fileMetadata.setDescription(getFileDescription());
       fileMetadata.setMimeType(getMimeType());
 
-      if ((this.mParentID != null) && (this.mParentID.length() > 0)) {
+      if ((this.mParentID != null) && !this.mParentID.equals("-1") && (this.mParentID.length() > 0)) {
         fileMetadata.setParents(Arrays.asList(new ParentReference[] { new ParentReference()
           .setId(this.mParentID) }));
       }
@@ -117,9 +120,10 @@ public class UploadCommand extends ICommand
 
         if (!setUploadedFile((com.google.api.services.drive.model.File)insert.execute()).booleanValue())
           break;
-        TreeNodeInfo uplodedFileTreeNodeInfo = GDriveFiles.FileProcessing(getUploadedFile());
+        TreeNodeInfo uplodedFileTreeNodeInfo = null;
         if (this.mParentID == null)
         {
+        	uplodedFileTreeNodeInfo = GDriveFiles.FileProcessing(getUploadedFile(), GDriveFiles.getMyDriveRootNode());
           List<TreeNodeInfo> directoryStructure = GDriveFiles.getMyDriveDirectoryStructure();
 
           directoryStructure.add(uplodedFileTreeNodeInfo);
@@ -130,6 +134,7 @@ public class UploadCommand extends ICommand
         }
         else {
           TreeNodeInfo parentNodeInfo = GDriveFiles.getFileTreeNodeInfo(this.mParentID);
+          uplodedFileTreeNodeInfo = GDriveFiles.FileProcessing(getUploadedFile(), parentNodeInfo);
           if (parentNodeInfo == null) break;
           List<TreeNodeInfo> childList = (List<TreeNodeInfo>)parentNodeInfo.get("CHILD");
           childList.add(uplodedFileTreeNodeInfo);
@@ -150,11 +155,21 @@ public class UploadCommand extends ICommand
       }
 
     }
+    catch (SocketSecurityException e) {
+    	throw e;
+    }
+    catch (SocketException e) {
+    	throw e;
+    }
+    catch (SocketTimeoutException e) {
+    	throw e;
+    }
     catch (FileNotFoundException e)
     {
       e.printStackTrace();
       throw e;
-    } catch (IOException e) {
+    } 
+    catch (IOException e) {
       System.out.println(SharedInstances.MY_RESOURCE
         .getString("I/O_ERROR"));
       e.printStackTrace();
@@ -214,7 +229,7 @@ public class UploadCommand extends ICommand
 
   public Boolean IsExecutable() {
     boolean isExecutable = false;
-    if (UploadOperation.NEW_REVISION == getUploadOperation()) {
+    if (UploadOperation.NEW_REVISION == getUploadOperation() || UploadOperation.NEW_UPLOAD == getUploadOperation()) {
       String fileID = getGDriveFile().getDFile().getId();
       if (fileID != null) {
         isExecutable = !fileID.isEmpty();
@@ -332,7 +347,7 @@ public class UploadCommand extends ICommand
       long inKB = fileSize / 1024L;
       if (inKB > 512L) {
         uploader.setDirectUploadEnabled(false);
-        uploader.setChunkSize(262144);
+        uploader.setChunkSize(MediaHttpUploader.MINIMUM_CHUNK_SIZE);
       }
     }
   }

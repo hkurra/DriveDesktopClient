@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.gdrive.desktop.client.Global.SharedInstances;
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.ChildList;
 import com.google.api.services.drive.model.ChildReference;
@@ -29,6 +30,9 @@ public class GDriveFiles
   private static TreeNodeInfo mMyDriveRootNode ;
   private static TreeNodeInfo mTrashedRootNode ;
   private static HashMap<String, TreeNodeInfo> mAllFileTreeNodeInfo;
+  private static HashMap<String, TreeNodeInfo> mAllFileParentTreeNodeInfo;
+  
+  //KEY CONSTANT FOR Directory structure
   public static final String SELF_KEY = "SELF";
   public static final String FILE_ID_KEY = "FILE_ID";
   public static final String IS_FOLDER_KEY = "IS_FOLDER";
@@ -37,6 +41,7 @@ public class GDriveFiles
 
   static
   {
+	  mAllFileParentTreeNodeInfo = new HashMap<String, TreeNodeInfo>();
 	  mAllFileTreeNodeInfo = new HashMap<String, TreeNodeInfo>();
 	  mMyDriveRootNode = createDummyNode("Drive", true);
 	  mTrashedRootNode = createDummyNode("Trashed", true);
@@ -54,7 +59,15 @@ public class GDriveFiles
       Drive.Files.List list = SharedInstances.DRIVE.files().list();
       FileList fileList = (FileList)list.execute();
       getAllFiles().addAll(fileList.getItems());
-    } catch (IOException e) {
+    } 
+	catch (TokenResponseException tokenException) {
+		
+//		if (SharedInstances.requestCount <3) {
+//			SharedInstances.changeUser();
+//			SharedInstances.requestCount = 0;
+//		}
+	}
+    catch (IOException e) {
       e.printStackTrace();
       getAllFiles().clear();
     } catch (Exception e) {
@@ -98,42 +111,45 @@ public class GDriveFiles
 
       if ((parentList.isEmpty()) || (!((ParentReference)parentList.get(0)).getIsRoot().booleanValue()))
         continue;
-      if (((File)getAllFiles().get(index)).getMimeType().equals("application/vnd.google-apps.folder"))
+      if (((File)getAllFiles().get(index)).getMimeType().equals(SharedInstances.FOLDER_MIME_TYPE))
       {
         if ((currentFile.getExplicitlyTrashed() != null) && (currentFile.getExplicitlyTrashed().booleanValue())) {
           getTrashedDirectoryStructure().add(FolderProcessing(
             (File)getAllFiles()
-            .get(index)));
+            .get(index), mTrashedRootNode));
         }
         else {
           getMyDriveDirectoryStructure().add(FolderProcessing(
             (File)getAllFiles()
-            .get(index)));
+            .get(index), mMyDriveRootNode));
         }
 
       }
       else if ((currentFile.getExplicitlyTrashed() != null) && (currentFile.getExplicitlyTrashed().booleanValue())) {
-        getTrashedDirectoryStructure().add(FileProcessing((File)getAllFiles().get(index)));
+        getTrashedDirectoryStructure().add(FileProcessing((File)getAllFiles().get(index), mTrashedRootNode));
       }
       else
         getMyDriveDirectoryStructure().add(
-          FileProcessing((File)getAllFiles().get(index)));
+          FileProcessing((File)getAllFiles().get(index), mMyDriveRootNode));
     }
   }
 
-  public static TreeNodeInfo FileProcessing(File driveFileRef)
+  public static TreeNodeInfo FileProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
   {
+	String fileID = driveFileRef.getId();
     TreeNodeInfo treeNodeInfo = new TreeNodeInfo();
     treeNodeInfo.put("SELF", driveFileRef);
     treeNodeInfo.put("CHILD", null);
-    treeNodeInfo.put("FILE_ID", driveFileRef.getId());
+    treeNodeInfo.put("FILE_ID", fileID);
     treeNodeInfo.put("IS_FOLDER", new Boolean(false));
 
-    mAllFileTreeNodeInfo.put(driveFileRef.getId(), treeNodeInfo);
+    mAllFileTreeNodeInfo.put(fileID, treeNodeInfo);
+    mAllFileParentTreeNodeInfo.put(fileID, parentNodeInfo);
+    
     return treeNodeInfo;
   }
 
-  private static TreeNodeInfo FolderProcessing(File driveFileRef)
+  public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
   {
     TreeNodeInfo treeNodeInfo = new TreeNodeInfo();
     treeNodeInfo.put("SELF", driveFileRef);
@@ -161,12 +177,15 @@ public class GDriveFiles
 
           Boolean isFallUnderTrashedDirStruct = Boolean.valueOf((!isParentTrashed.booleanValue()) && (isFileTrashded.booleanValue()));
           boolean testVar;
-          if (childFileRef.getMimeType().equals("application/vnd.google-apps.folder")) {
-            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(FolderProcessing(childFileRef)) : childList.add(FolderProcessing(childFileRef));
+          if (childFileRef.getMimeType().equals(SharedInstances.FOLDER_MIME_TYPE)) {
+            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(FolderProcessing(childFileRef, treeNodeInfo)) : childList.add(FolderProcessing(childFileRef, treeNodeInfo));
           }
           else
           {
-            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(FileProcessing(childFileRef)) : childList.add(FileProcessing(childFileRef));
+            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(FileProcessing(childFileRef, treeNodeInfo)) : childList.add(FileProcessing(childFileRef, treeNodeInfo));
+          }
+          if(testVar == false) {
+    
           }
         }
         request.setPageToken(children.getNextPageToken());
@@ -183,6 +202,7 @@ public class GDriveFiles
     treeNodeInfo.put("CHILD", childList);
 
     mAllFileTreeNodeInfo.put(driveFileRef.getId(), treeNodeInfo);
+    mAllFileParentTreeNodeInfo.put(driveFileRef.getId(), parentNodeInfo);
     return treeNodeInfo;
   }
 
@@ -207,6 +227,23 @@ public class GDriveFiles
     }
   }
 
+	/**
+	 * 
+	 * search for fileID within cached files & return match file
+	 * 
+	 * <p>
+	 * if refreshCaching is true this will reread whole Drive(very costlier call
+	 * so think twice before using it)
+	 * </p>
+	 * <p>
+	 * if serverversion is true it will redirect search call to Google Drive
+	 * </p>
+	 * 
+	 * @param --> fileID
+	 * @param --> refreshCaching
+	 * @param --> serverVersion
+	 * @return <-- Searched File or null in case file not found
+	 */
   public static File searchFileID(String fileID, boolean refreshCaching, boolean serverVersion)
   {
     File searchFile = null;
@@ -236,6 +273,11 @@ public class GDriveFiles
   {
     return (TreeNodeInfo)mAllFileTreeNodeInfo.get(fileId);
   }
+  
+  public static TreeNodeInfo getFileParentTreeNodeInfo(String fileId)
+  {
+    return (TreeNodeInfo)mAllFileParentTreeNodeInfo.get(fileId);
+  }
 
   private static void setAllFiles(List<File> allFiles)
   {
@@ -259,6 +301,17 @@ public class GDriveFiles
     return rootNode;
   }
 
+  /**
+   * <p>must call it after deleting some node permanently from tree</p>
+   * <p>otherwise it will lead to wrong cache + extra memory</p>
+   * 
+   * @param --> FileID
+   */
+   static void removeTreeNodeRefrence(String FileID) {
+	  mAllFileParentTreeNodeInfo.remove(FileID);
+	  mAllFileTreeNodeInfo.remove(FileID);
+  }
+  
   public static void setMyDriveDirectoryStructure(List<TreeNodeInfo> myDriveDirectoryStructure)
   {
     mMyDriveDirectoryStructure = myDriveDirectoryStructure;
@@ -274,6 +327,16 @@ public class GDriveFiles
     mTrashedDirectoryStructure = trashedDirectoryStructure;
   }
 
+  public static TreeNodeInfo getMyDriveRootNode()
+  {
+    return mMyDriveRootNode;
+  }
+  
+  public static TreeNodeInfo getTrashedRootNode()
+  {
+    return mTrashedRootNode;
+  }
+  
   public static List<TreeNodeInfo> getTrashedDirectoryStructure()
   {
     return mTrashedDirectoryStructure;

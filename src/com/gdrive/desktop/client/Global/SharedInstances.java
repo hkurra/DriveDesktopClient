@@ -10,6 +10,8 @@ import com.gdrive.desktop.client.Authorization.UserAutorization;
 import com.gdrive.desktop.client.cache.GDriveFileRevisions;
 import com.gdrive.desktop.client.cache.GDriveFiles;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenErrorResponse;
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -140,6 +142,7 @@ public class SharedInstances
 	 */
 	public static final String  BINARY_FILE_MIME_TYPE = "application/octet-stream";
 	
+	//public static int requestCount = 0;
     static {
         REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
         MY_RESOURCE = java.util.ResourceBundle.getBundle("Bundle");
@@ -164,11 +167,18 @@ public class SharedInstances
 			isGdriveSetUped = (DRIVE != null);
 			try {
 				 ABOUT = DRIVE.about().get().execute();
-			} catch (IOException e) {
+			} 
+			
+			catch (TokenResponseException tokenException) {
+				
+				
+			}
+			catch (IOException e) {
 				isGdriveSetUped = false;
 				e.printStackTrace();
 				break;
 			}
+
 			
 			GDriveFiles.CacheAllFiles();
 			GDriveFileRevisions.cacheAllFileRevision();
@@ -177,8 +187,13 @@ public class SharedInstances
     }
     
     public static void changeUser() {
+    	try {
     	DATA_STORE_DIR.delete();
     	setUpGDrive();
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    	}
    }
     
 }

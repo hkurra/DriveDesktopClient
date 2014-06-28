@@ -40,8 +40,8 @@ public class GDriveFile {
 	 * for folder @param filePath is folder's name
 	 * </p>
 	 * 
-	 * @param filePath
-	 * @param driveFile
+	 * @param --> filePath
+	 * @param --> driveFile
 	 */
 	public GDriveFile(final String filePath, final File driveFile) {
 		if (driveFile != null)

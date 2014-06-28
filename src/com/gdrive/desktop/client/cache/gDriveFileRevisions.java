@@ -81,7 +81,7 @@ public class GDriveFileRevisions {
 		}
 		if (serverVersion) {
 			try {
-				fileRevisions = getFileRevision(fileID);
+				fileRevisions = getFileRevisionFromServer(fileID);
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}

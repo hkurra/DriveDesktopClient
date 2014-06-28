@@ -28,7 +28,7 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 	public int getChildCount() {
 
 		int childCount = 0;
-		final List<HashMap<String, Object>> hjk = (List<HashMap<String, Object>>) get(GDriveFiles.CHILD_KEY);
+		final List<TreeNodeInfo> hjk = (List<TreeNodeInfo>) get(GDriveFiles.CHILD_KEY);
 		if (hjk != null) {
 			childCount = hjk.size();
 		}
@@ -38,8 +38,8 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 	public int getIndexOfChild(final TreeNodeInfo child) {
 
 		int childIndex = -1;
-		final List<HashMap<String, Object>> hjk = (List<HashMap<String, Object>>) get(GDriveFiles.CHILD_KEY);
-		final Iterator<HashMap<String, Object>> iterator = hjk.iterator();
+		final List<TreeNodeInfo> hjk = getChildrenList();
+		final Iterator<TreeNodeInfo> iterator = hjk.iterator();
 		while (iterator.hasNext()) {
 			childIndex++;
 			if (child.get(GDriveFiles.FILE_ID_KEY).equals(
@@ -52,6 +52,19 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 		return 0;
 	}
 
+	public void deleteChildren(TreeNodeInfo child) {
+		int childIndex  = getIndexOfChild(child);
+		final List<TreeNodeInfo> childList = getChildrenList();
+		childList.remove(childIndex);
+		GDriveFiles.removeTreeNodeRefrence((String)child.get(GDriveFiles.FILE_ID_KEY));
+	}
+	
+	public List<TreeNodeInfo> getChildrenList() {
+		
+		final List<TreeNodeInfo> childList = (List<TreeNodeInfo>) get(GDriveFiles.CHILD_KEY);
+		
+		return childList;
+	}
 	@Override
 	public String toString() {
 

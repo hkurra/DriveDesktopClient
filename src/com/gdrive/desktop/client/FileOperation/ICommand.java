@@ -4,7 +4,7 @@ public abstract class ICommand
 {
   protected Object Result = null;
 
-  public void DoExcute()
+  public void DoExcute() throws  Exception
   {
     try
     {
@@ -17,6 +17,7 @@ public abstract class ICommand
     catch (Exception e)
     {
       e.printStackTrace();
+      throw e;
     }
   }
 

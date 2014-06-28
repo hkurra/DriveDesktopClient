@@ -2,7 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>GDriveDesktopClient</groupId>
   <artifactId>GDriveDesktopClient</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>Google Drive Desktop Client</name>
   <description>java library to perform file operation on google drive</description>
   <build>
@@ -86,4 +85,5 @@
   		<version>1.18.0-rc</version>
   	</dependency>
   </dependencies>
+  <version>1.0.0</version>
 </project>

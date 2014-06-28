@@ -11,7 +11,9 @@ public class ServiceManager {
 	
 	public static enum serviceType {
 	      BEFORE_UPLOAD_SERVICE_ID,
-	      AFTER_UPLOAD_SERVICE_ID
+	      AFTER_UPLOAD_SERVICE_ID,
+	      UPDATE_FILE_CACHE_SERVICE_ID,
+	      AFTER_FILE_DELETE_SERVICE_ID
 	  };
 	
 	public static void registerResponder(IResponder responder, serviceType service ) {
