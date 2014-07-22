@@ -6,7 +6,7 @@ package com.gdrive.desktop.client.FileOperation;
 
 
 import com.gdrive.desktop.client.Global.ServiceManager;
-import com.gdrive.desktop.client.Global.SharedInstances;
+import com.gdrive.desktop.client.Global.DriveDesktopClient;
 import com.gdrive.desktop.client.Global.ResponderData.AfterFileDeleteResponderData;
 import com.gdrive.desktop.client.cache.GDriveFiles;
 import com.gdrive.desktop.client.cache.TreeNodeInfo;
@@ -113,7 +113,7 @@ public class DeleteCommand extends ICommand {
 		do {
 		try {
 		if (mTrash && !mIsTrashed) {
-			Result = SharedInstances.DRIVE.files().trash(mFileID).execute();
+			Result = DriveDesktopClient.DRIVE.files().trash(mFileID).execute();
 			TreeNodeInfo ParentNode = GDriveFiles.getFileParentTreeNodeInfo(mFileID);
 			ParentNode.deleteChildren(GDriveFiles.getFileTreeNodeInfo(mFileID));
 			GDriveFiles.getTrashedDirectoryStructure().add(mIsFolder ? 
@@ -122,10 +122,10 @@ public class DeleteCommand extends ICommand {
 		}
 		
 		else if(mDeleteRevision) {
-			Result = SharedInstances.DRIVE.revisions().delete(mFileID, mRevisionID).execute();
+			Result = DriveDesktopClient.DRIVE.revisions().delete(mFileID, mRevisionID).execute();
 		}
 		else if (!mTrash)  {
-			Result = SharedInstances.DRIVE.files().delete(mFileID).execute();
+			Result = DriveDesktopClient.DRIVE.files().delete(mFileID).execute();
 			TreeNodeInfo ParentNode = GDriveFiles.getFileParentTreeNodeInfo(mFileID);
 			ParentNode.deleteChildren(GDriveFiles.getFileTreeNodeInfo(mFileID));
 		}

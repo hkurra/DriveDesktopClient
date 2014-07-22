@@ -3,7 +3,7 @@ package com.gdrive.desktop.client.FileOperation;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import com.gdrive.desktop.client.Global.SharedInstances;
+import com.gdrive.desktop.client.Global.DriveDesktopClient;
 import com.gdrive.desktop.client.ProgressListoner.FileDownloadProgressListener;
 import com.gdrive.desktop.client.ProgressListoner.IProgressListoner;
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
@@ -26,12 +26,18 @@ public class DownloadCommand extends ICommand {
 	String mLocalDirPath;
 	
 	/**
-	 * 
+	 * Listener for download progress
 	 */
-	private IProgressListoner mProgressListoner;
+	private IProgressListoner mProgressListener;
 	
 	
 	
+	/**
+	 * Constructor 
+	 * 
+	 * @param fileToDownload
+	 * @param localDirpath
+	 */
 	public DownloadCommand(File fileToDownload, String localDirpath) {
 		mFileToDownload = fileToDownload;
 		mLocalDirPath = localDirpath;
@@ -59,7 +65,7 @@ public class DownloadCommand extends ICommand {
 //	                  .execute();
 //	           InputStream inputStream = resp.getContent();
 	           
-	         java.io.File file = new java.io.File(mLocalDirPath + "/" + mFileToDownload.getTitle());
+	        java.io.File file = new java.io.File(mLocalDirPath + "/" + mFileToDownload.getTitle());
 	   		FileOutputStream fileoutputStream = new FileOutputStream(file);
 //	   		int read = 0;
 //			byte[] bytes = new byte[1024];
@@ -70,20 +76,14 @@ public class DownloadCommand extends ICommand {
 //			}
 	   		
 	   	    MediaHttpDownloader downloader =
-	   	        new MediaHttpDownloader(SharedInstances.HTTP_TRANSPORT, SharedInstances.DRIVE.getRequestFactory().getInitializer());
-	   	    //downloader.setDirectDownloadEnabled(useDirectDownload);
+	   	        new MediaHttpDownloader(DriveDesktopClient.HTTP_TRANSPORT, DriveDesktopClient.DRIVE.getRequestFactory().getInitializer());
 	   	    enableProgressListoner(downloader);
 	   	    downloader.download(new GenericUrl(mFileToDownload.getDownloadUrl()), fileoutputStream);
 			fileoutputStream.flush();
 			fileoutputStream.close();
 			
 	        } catch (IOException e) {
-	          // An error occurred.
-	          e.printStackTrace();
 	          throw e;
-	        }
-	        finally {
-	        	
 	        }
 	      }
 		return 0;
@@ -112,14 +112,14 @@ public class DownloadCommand extends ICommand {
 	 * @param mProgressListoner the mProgressListoner to set
 	 */
 	public void setProgressListoner(IProgressListoner mProgressListoner) {
-		this.mProgressListoner = mProgressListoner;
+		this.mProgressListener = mProgressListoner;
 	}
 
 	/**
 	 * @return the mProgressListoner
 	 */
 	public IProgressListoner getProgressListoner() {
-		return mProgressListoner;
+		return mProgressListener;
 	}
 
 }

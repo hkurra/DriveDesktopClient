@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  *
  * @author harsh
  */
-public class SharedInstances
+public class DriveDesktopClient
 {
 
     /**
@@ -49,6 +49,13 @@ public class SharedInstances
      *
      */
     public static String REDIRECT_URI;
+    
+    public static String ProxyHostname;
+    public static String ProxyPost;
+    public static String Password;
+    public static String UserName;
+    
+    
     /**
      *  Information about the current user along with Drive API settings
      */
@@ -152,12 +159,23 @@ public class SharedInstances
             DATA_STORE_FACOTRY = new FileDataStoreFactory(DATA_STORE_DIR);
             HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         } catch (GeneralSecurityException ex) {
-            Logger.getLogger(SharedInstances.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DriveDesktopClient.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(SharedInstances.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DriveDesktopClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-   public static Boolean setUpGDrive() {
+   /**
+    * <p>first step to set up this library</p>
+    * <p>call it just after setting your Client code and secret code on SharedInstance</p>
+    * <p>eg:      SharedInstances.CLIENT_ID = "YOUR CLIENT ID";
+        		  SharedInstances.CLIENT_SECRET = "YOUR CLIENT SECRET";
+                  SharedInstances.APPLICATION_NAME = "YOUR APPLICATION NAME";
+         		  if (DriveDesktopClient.setUpGDrive()){
+        			//Set Up your Application
+            	  }</p>
+ * @return
+ */
+public static Boolean setUpGDrive() {
 	   Boolean isGdriveSetUped = false;
 	   
 	   do {
@@ -186,6 +204,9 @@ public class SharedInstances
 		return isGdriveSetUped;
     }
     
+    /**
+     * <p>use to change user</p>
+     */
     public static void changeUser() {
     	try {
     	DATA_STORE_DIR.delete();

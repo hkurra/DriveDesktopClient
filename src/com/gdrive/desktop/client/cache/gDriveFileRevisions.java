@@ -5,11 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.gdrive.desktop.client.Global.SharedInstances;
+import com.gdrive.desktop.client.Global.DriveDesktopClient;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Revision;
 import com.google.api.services.drive.model.RevisionList;
 
+/**
+ * <p>Maintain caching of File's revision </p>
+ * 
+ * @author harsh
+ *
+ */
 public class GDriveFileRevisions {
 
 	private static HashMap<String, List<Revision>> mAllFileRevision;
@@ -18,33 +24,48 @@ public class GDriveFileRevisions {
 		mAllFileRevision = new HashMap<String, List<Revision>>();
 	}
 
+	/**
+	 * <p>refresh all files revision</p>
+	 */
 	public static void cacheAllFileRevision() {
 		final List<File> allFile = GDriveFiles.getAllFiles();
 		getAllFileRevision().clear();
 		try {
 			for (final File file : allFile) {
 
+				if (!file.getMimeType().equals(DriveDesktopClient.FOLDER_MIME_TYPE)) {	
 				getAllFileRevision().put(file.getId(),
 						getFileRevisionFromServer(file.getId()));
+				}
 			}
+			
 		} catch (final Exception e) {
 			getAllFileRevision().clear();
 		}
 	}
 
+	/**
+	 * <p>get file revision from server</p>
+	 * @param fileID
+	 * @return
+	 * @throws Exception
+	 */
 	private static List<Revision> getFileRevisionFromServer(final String fileID)
 			throws Exception {
 
 		try {
-			final RevisionList revisions = SharedInstances.DRIVE.revisions()
+			final RevisionList revisions = DriveDesktopClient.DRIVE.revisions()
 					.list(fileID).execute();
 			return revisions.getItems();
 		} catch (final IOException e) {
 			throw e;
 		}
 	}
-
-	  
+	
+	/**
+	 * sync drive file revision to local cache
+	 * @param fileID
+	 */
 	public static void updateFileRevision(final String fileID) {
 
 		try {
@@ -64,7 +85,9 @@ public class GDriveFileRevisions {
 	 * so think twice before using it)
 	 * </p>
 	 * <p>
-	 * if serverversion is true it will redirect search call to Google Drive
+	 * if server version is true it will redirect search call to Google Drive
+	 *  <p>use it if query of 
+	 *  file revision is not frequent</p>
 	 * </p>
 	 * 
 	 * @param fileID
@@ -106,5 +129,12 @@ public class GDriveFileRevisions {
 	public static HashMap<String, List<Revision>> getAllFileRevision() {
 		return mAllFileRevision;
 	}
+	/**
+	 * <p>remove file revision from cache</p>
+	 * @param fileID
+	 */
+	public static void deleteRevision(String fileID){
+		getAllFileRevision().remove(fileID);
+	} 
 
 }

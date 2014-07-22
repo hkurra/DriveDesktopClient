@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.gdrive.desktop.client.Global.SharedInstances;
+import com.gdrive.desktop.client.Global.DriveDesktopClient;
 import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.ChildList;
@@ -43,7 +43,7 @@ public class GDriveFiles
   {
 	  mAllFileParentTreeNodeInfo = new HashMap<String, TreeNodeInfo>();
 	  mAllFileTreeNodeInfo = new HashMap<String, TreeNodeInfo>();
-	  mMyDriveRootNode = createDummyNode("Drive", true);
+	  mMyDriveRootNode = createDummyNode("MY Drive", true);
 	  mTrashedRootNode = createDummyNode("Trashed", true);
     setMyDriveDirectoryStructure(new ArrayList<TreeNodeInfo>());
     setTrashedDirectoryStructure(new ArrayList<TreeNodeInfo>());
@@ -51,12 +51,15 @@ public class GDriveFiles
     setDirectoryStructure(new ArrayList<TreeNodeInfo>());
   }
 
-  public static void CacheAllFiles()
+  /**
+ * Cache All files meta data and build directory structure
+ */
+public static void CacheAllFiles()
   {
     try
     {
       getAllFiles().clear();
-      Drive.Files.List list = SharedInstances.DRIVE.files().list();
+      Drive.Files.List list = DriveDesktopClient.DRIVE.files().list();
       FileList fileList = (FileList)list.execute();
       getAllFiles().addAll(fileList.getItems());
     } 
@@ -77,6 +80,10 @@ public class GDriveFiles
     finally
     {
       getDirectoryStructure().clear();
+      mAllFileTreeNodeInfo.clear();
+      mAllFileParentTreeNodeInfo.clear();
+      getMyDriveDirectoryStructure().clear();
+      getTrashedDirectoryStructure().clear();
     }
     CreateDirectoryStructure();
 
@@ -88,21 +95,10 @@ public class GDriveFiles
     printDirectoryStructure();
   }
 
-  private static void childStructure(Object dummyContent)
-  {
-	  final List<TreeNodeInfo> childList = (List<TreeNodeInfo>) dummyContent;
-    for (int childNode = 0; childNode < childList.size(); childNode++) {
-      TreeNodeInfo content = (TreeNodeInfo)childList.get(childNode);
-      System.out
-        .println("->" + ((File)content.get("SELF")).getTitle());
-      if (content.get("CHILD") != null) {
-        System.out.print("->");
-        childStructure(content.get("CHILD"));
-      }
-    }
-  }
-
-  private static void CreateDirectoryStructure()
+  /**
+ * create Directory structure for all derive files
+ */
+private static void CreateDirectoryStructure()
   {
     for (int index = 0; index < getAllFiles().size(); index++) {
       List<ParentReference> parentList = ((File)getAllFiles().get(index))
@@ -111,7 +107,7 @@ public class GDriveFiles
 
       if ((parentList.isEmpty()) || (!((ParentReference)parentList.get(0)).getIsRoot().booleanValue()))
         continue;
-      if (((File)getAllFiles().get(index)).getMimeType().equals(SharedInstances.FOLDER_MIME_TYPE))
+      if (((File)getAllFiles().get(index)).getMimeType().equals(DriveDesktopClient.FOLDER_MIME_TYPE))
       {
         if ((currentFile.getExplicitlyTrashed() != null) && (currentFile.getExplicitlyTrashed().booleanValue())) {
           getTrashedDirectoryStructure().add(FolderProcessing(
@@ -134,7 +130,13 @@ public class GDriveFiles
     }
   }
 
-  public static TreeNodeInfo FileProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
+  /**
+   * create treeNodeInfo for File 
+ * @param driveFileRef
+ * @param parentNodeInfo
+ * @return
+ */
+public static TreeNodeInfo FileProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
   {
 	String fileID = driveFileRef.getId();
     TreeNodeInfo treeNodeInfo = new TreeNodeInfo();
@@ -149,7 +151,13 @@ public class GDriveFiles
     return treeNodeInfo;
   }
 
-  public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
+  /**
+   * create treeNodeInfo for Folder
+ * @param driveFileRef
+ * @param parentNodeInfo
+ * @return
+ */
+public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
   {
     TreeNodeInfo treeNodeInfo = new TreeNodeInfo();
     treeNodeInfo.put("SELF", driveFileRef);
@@ -159,7 +167,7 @@ public class GDriveFiles
     List<TreeNodeInfo> childList = new ArrayList<TreeNodeInfo>();
     Drive.Children.List request = null;
     try {
-      request = SharedInstances.DRIVE.children().list(
+      request = DriveDesktopClient.DRIVE.children().list(
         driveFileRef.getId());
     } catch (IOException e1) {
       e1.printStackTrace();
@@ -177,7 +185,7 @@ public class GDriveFiles
 
           Boolean isFallUnderTrashedDirStruct = Boolean.valueOf((!isParentTrashed.booleanValue()) && (isFileTrashded.booleanValue()));
           boolean testVar;
-          if (childFileRef.getMimeType().equals(SharedInstances.FOLDER_MIME_TYPE)) {
+          if (childFileRef.getMimeType().equals(DriveDesktopClient.FOLDER_MIME_TYPE)) {
             testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(FolderProcessing(childFileRef, treeNodeInfo)) : childList.add(FolderProcessing(childFileRef, treeNodeInfo));
           }
           else
@@ -199,10 +207,11 @@ public class GDriveFiles
     if (childList.size() == 0) {
       childList.add(createDummyNode("Empty", false));
     }
-    treeNodeInfo.put("CHILD", childList);
-
+    treeNodeInfo.addChildNodes(childList);
+    
     mAllFileTreeNodeInfo.put(driveFileRef.getId(), treeNodeInfo);
     mAllFileParentTreeNodeInfo.put(driveFileRef.getId(), parentNodeInfo);
+    
     return treeNodeInfo;
   }
 
@@ -224,6 +233,20 @@ public class GDriveFiles
         continue;
       }
       childStructure(content.get("CHILD"));
+    }
+  }
+  
+  private static void childStructure(Object dummyContent)
+  {
+	  final List<TreeNodeInfo> childList = (List<TreeNodeInfo>) dummyContent;
+    for (int childNode = 0; childNode < childList.size(); childNode++) {
+      TreeNodeInfo content = (TreeNodeInfo)childList.get(childNode);
+      System.out
+        .println("->" + ((File)content.get("SELF")).getTitle());
+      if (content.get("CHILD") != null) {
+        System.out.print("->");
+        childStructure(content.get("CHILD"));
+      }
     }
   }
 
@@ -253,7 +276,7 @@ public class GDriveFiles
     if (serverVersion)
       try {
         searchFile = 
-          (File)SharedInstances.DRIVE.files().get(fileID)
+          (File)DriveDesktopClient.DRIVE.files().get(fileID)
           .execute();
       } catch (IOException e) {
         e.printStackTrace();
@@ -312,6 +335,20 @@ public class GDriveFiles
 	  mAllFileTreeNodeInfo.remove(FileID);
   }
   
+   private static boolean isUnderMyDrive(File fileRef){
+	   boolean underMYdrive = false;
+	   
+	      List<ParentReference> parentList = fileRef.getParents();
+	      if (!parentList.isEmpty()){
+	    	  for (ParentReference parentReference : parentList) {
+	    		  if (parentReference.getIsRoot()) {
+	    			  underMYdrive = true;
+	    			  break;
+	    		  }
+	    	  }
+	      }
+	   return underMYdrive;
+   }
   public static void setMyDriveDirectoryStructure(List<TreeNodeInfo> myDriveDirectoryStructure)
   {
     mMyDriveDirectoryStructure = myDriveDirectoryStructure;

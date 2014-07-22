@@ -4,7 +4,7 @@
  */
 package com.gdrive.desktop.client.Authorization;
 
-import com.gdrive.desktop.client.Global.SharedInstances;
+import com.gdrive.desktop.client.Global.DriveDesktopClient;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -31,11 +31,11 @@ public class UserAutorization {
 		Credential credential = null;
 		try {
 			final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-					SharedInstances.HTTP_TRANSPORT,
-					SharedInstances.JSON_FACTORY, SharedInstances.CLIENT_ID,
-					SharedInstances.CLIENT_SECRET,
+					DriveDesktopClient.HTTP_TRANSPORT,
+					DriveDesktopClient.JSON_FACTORY, DriveDesktopClient.CLIENT_ID,
+					DriveDesktopClient.CLIENT_SECRET,
 					Collections.singleton(DriveScopes.DRIVE))
-			.setDataStoreFactory(SharedInstances.DATA_STORE_FACOTRY)
+			.setDataStoreFactory(DriveDesktopClient.DATA_STORE_FACOTRY)
 			.build();
 			// authorize user credential read from folder(set by us in user
 			// folder) else ask for authorization from user on browser and store

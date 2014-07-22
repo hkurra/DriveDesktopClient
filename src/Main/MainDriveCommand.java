@@ -18,7 +18,7 @@ import com.gdrive.desktop.client.FileOperation.CopyCommand;
 import com.gdrive.desktop.client.FileOperation.UploadCommand;
 import com.gdrive.desktop.client.FileOperation.ICommand;
 import com.gdrive.desktop.client.FileOperation.UploadCommand.UploadOperation;
-import com.gdrive.desktop.client.Global.SharedInstances;
+import com.gdrive.desktop.client.Global.DriveDesktopClient;
 import com.gdrive.desktop.client.cache.GDriveFile;
 import com.gdrive.desktop.client.cache.GDriveFileRevisions;
 import com.gdrive.desktop.client.cache.GDriveFiles;
@@ -40,13 +40,13 @@ public class MainDriveCommand {
         
         assert(args.length == 3 || !args[0].isEmpty() || !args[1].isEmpty() || !args[2].isEmpty()):"Invalid argument";
         
-        SharedInstances.CLIENT_ID = args[0];
-        SharedInstances.CLIENT_SECRET = args[1];
-           SharedInstances.APPLICATION_NAME = args[2];
+        DriveDesktopClient.CLIENT_ID = args[0];
+        DriveDesktopClient.CLIENT_SECRET = args[1];
+        DriveDesktopClient.APPLICATION_NAME = args[2];
         
 
-         if (SharedInstances.setUpGDrive()){
-        	System.out.println(SharedInstances.MY_RESOURCE.getString("SUCCESS_AUTHORIZATION_MSSG"));
+         if (DriveDesktopClient.setUpGDrive()){
+        	System.out.println(DriveDesktopClient.MY_RESOURCE.getString("SUCCESS_AUTHORIZATION_MSSG"));
         }
         System.out.println("***************************************************");
        

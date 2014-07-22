@@ -9,7 +9,7 @@ import java.io.IOException;
 
 
 
-import com.gdrive.desktop.client.Global.SharedInstances;
+import com.gdrive.desktop.client.Global.DriveDesktopClient;
 import com.gdrive.desktop.client.cache.GDriveFiles;
 import com.google.api.services.drive.model.File;
 
@@ -73,10 +73,10 @@ public class CopyCommand extends ICommand {
 	@Override
 	protected int Execute() throws Exception {
 	    try {
-	      Result = SharedInstances.DRIVE.files().copy(mOrigionFileId, mCopiedFile).execute();
+	      Result = DriveDesktopClient.DRIVE.files().copy(mOrigionFileId, mCopiedFile).execute();
 	    } 
 	    catch (IOException e) {
-	      System.out.println( SharedInstances.MY_RESOURCE.getString("GENERELIZED_ERROR")+ e);
+	      System.out.println( DriveDesktopClient.MY_RESOURCE.getString("GENERELIZED_ERROR")+ e);
 	      throw e;
 	    }
 		return 0;

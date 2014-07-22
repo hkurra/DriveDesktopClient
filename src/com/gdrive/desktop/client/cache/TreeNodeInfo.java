@@ -1,9 +1,12 @@
 package com.gdrive.desktop.client.cache;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import com.gdrive.desktop.client.Global.ServiceManager;
+import com.gdrive.desktop.client.Global.ServiceManager.serviceType;
 import com.google.api.services.drive.model.File;
 
 /*
@@ -11,34 +14,64 @@ import com.google.api.services.drive.model.File;
  * and open the template in the editor.
  */
 /**
+ * <p>
+ * represent Tree Node Info in drive tree structure
+ * </p>
  * 
  * @author harsh
  */
 public class TreeNodeInfo extends HashMap<String, Object> {
 
-	public Object getChild(final int index) {
-		Object childNodeInfo = null;
+	/**
+	 * @return
+	 */
+	public List<TreeNodeInfo> getChildNodes() {
+		final List<TreeNodeInfo> childList = (List<TreeNodeInfo>) get(GDriveFiles.CHILD_KEY);
+		return childList;
+	}
+	/**
+	 * <p>
+	 * this method return child of Tree Node at index i if child exist at i else
+	 * null
+	 * </p>
+	 * 
+	 * @param index
+	 *            of child node
+	 * @return
+	 */
+	public TreeNodeInfo getChild(final int index) {
+		TreeNodeInfo childNodeInfo = null;
 		if (get(GDriveFiles.CHILD_KEY) != null) {
-			final List<HashMap<String, Object>> hjk = (List<HashMap<String, Object>>) get(GDriveFiles.CHILD_KEY);
-			childNodeInfo = hjk.get(index);
+			 List<TreeNodeInfo> childList = getChildNodes();
+			childNodeInfo = childList.get(index);
 		}
 		return childNodeInfo;
 	}
 
+	/**
+	 * Number of child nodes of Tree node
+	 * @return childCount
+	 */
 	public int getChildCount() {
 
 		int childCount = 0;
-		final List<TreeNodeInfo> hjk = (List<TreeNodeInfo>) get(GDriveFiles.CHILD_KEY);
-		if (hjk != null) {
-			childCount = hjk.size();
+		final List<TreeNodeInfo> childList = getChildNodes();
+		if (childList != null) {
+			childCount = childList.size();
 		}
 		return childCount;
 	}
 
+	/**
+	 * <p>this method return index of child node if it exist in Tree Node else -1</p>
+	 * 
+	 * @param child
+	 * @return child index
+	 */
 	public int getIndexOfChild(final TreeNodeInfo child) {
 
 		int childIndex = -1;
-		final List<TreeNodeInfo> hjk = getChildrenList();
+		final List<TreeNodeInfo> hjk = getChildNodes();
 		final Iterator<TreeNodeInfo> iterator = hjk.iterator();
 		while (iterator.hasNext()) {
 			childIndex++;
@@ -46,26 +79,57 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 					iterator.next().get(GDriveFiles.FILE_ID_KEY))) {
 				return childIndex;
 			}
-
 		}
-
-		return 0;
+		return childIndex;
 	}
 
+	/**
+	 * <p> this method delete child of tree node if exist</p>
+	 * <p>ths also remove child from cached structure of tree node reference & file revision</p>
+	 * 
+	 * @param child node
+	 */
 	public void deleteChildren(TreeNodeInfo child) {
-		int childIndex  = getIndexOfChild(child);
-		final List<TreeNodeInfo> childList = getChildrenList();
+		int childIndex = getIndexOfChild(child);
+		final List<TreeNodeInfo> childList = getChildNodes();
 		childList.remove(childIndex);
-		GDriveFiles.removeTreeNodeRefrence((String)child.get(GDriveFiles.FILE_ID_KEY));
+		
+		String fileID = (String) child.get(GDriveFiles.FILE_ID_KEY);
+				
+		GDriveFiles.removeTreeNodeRefrence(fileID);
+		GDriveFileRevisions.deleteRevision(fileID);
+	}
+
+	/**
+	 * <p>add child Nodes in TreeNode</p>
+	 * <p>replace the previous child nodes</p>
+	 * 
+	 * @param childList
+	 */
+	public void addChildNodes(List<TreeNodeInfo> childList) {
+		put(GDriveFiles.CHILD_KEY, childList);
 	}
 	
-	public List<TreeNodeInfo> getChildrenList() {
+	/**
+	 * <p>add child in TreeNode</p>
+	 * 
+	 * <p>if silentAdd is false update call is generated</p>
+	 * <p>register your listener for this update call<ADD_NEW_NODE_SERVICE_ID></p> 
+	 * @param childList
+	 * @param silentAdd
+	 */
+	public void addChild(TreeNodeInfo child, Boolean silentAdd) {
 		
-		final List<TreeNodeInfo> childList = (List<TreeNodeInfo>) get(GDriveFiles.CHILD_KEY);
-		
-		return childList;
+		List<TreeNodeInfo> childList =  getChildNodes();
+		if (childList == null) {
+			childList = new ArrayList<TreeNodeInfo>();
+		}
+		if (childList.add(child) && !silentAdd) {
+			ServiceManager.ExecuteResponders(ServiceManager.serviceType.ADD_NEW_NODE_SERVICE_ID, null);
+		}
 	}
-	@Override
+	
+@Override
 	public String toString() {
 
 		String fileName = "Unknown File";
