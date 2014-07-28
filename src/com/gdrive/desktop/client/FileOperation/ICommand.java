@@ -1,5 +1,10 @@
 package com.gdrive.desktop.client.FileOperation;
 
+/**
+ * Base class for Command implementation 
+ * @author harsh
+ *
+ */
 public abstract class ICommand
 {
   protected Object Result = null;
@@ -8,7 +13,7 @@ public abstract class ICommand
 
   /**
    * <p>Use to execute Command Which don't provide post listener(post Execute callback)
-   * and if you dont register your post listener want to know execption</p>
+   * or if you dont register your post listener and still want to know execption</p>
  * @throws Exception
  */
 public void DoExcute() throws  Exception

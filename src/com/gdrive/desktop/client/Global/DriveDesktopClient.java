@@ -10,7 +10,6 @@ import com.gdrive.desktop.client.Authorization.UserAutorization;
 import com.gdrive.desktop.client.cache.GDriveFileRevisions;
 import com.gdrive.desktop.client.cache.GDriveFiles;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.TokenErrorResponse;
 import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
@@ -27,6 +26,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Entry Pass to use this Library 
+ * 
+ * @see DriveDesktopClient.setUpGDrive()
  *
  * @author harsh
  */
@@ -167,9 +169,9 @@ public class DriveDesktopClient
    /**
     * <p>first step to set up this library</p>
     * <p>call it just after setting your Client code and secret code on SharedInstance</p>
-    * <p>eg:      SharedInstances.CLIENT_ID = "YOUR CLIENT ID";
-        		  SharedInstances.CLIENT_SECRET = "YOUR CLIENT SECRET";
-                  SharedInstances.APPLICATION_NAME = "YOUR APPLICATION NAME";
+    * <p>eg:      DriveDesktopClient.CLIENT_ID = "YOUR CLIENT ID";
+        		  DriveDesktopClient.CLIENT_SECRET = "YOUR CLIENT SECRET";
+                  DriveDesktopClient.APPLICATION_NAME = "YOUR APPLICATION NAME";
          		  if (DriveDesktopClient.setUpGDrive()){
         			//Set Up your Application
             	  }</p>
@@ -206,6 +208,7 @@ public static Boolean setUpGDrive() {
     
     /**
      * <p>use to change user</p>
+     * TODO currently not working 
      */
     public static void changeUser() {
     	try {

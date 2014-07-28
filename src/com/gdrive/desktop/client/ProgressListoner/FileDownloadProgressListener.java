@@ -1,11 +1,10 @@
 package com.gdrive.desktop.client.ProgressListoner;
 
-import java.io.IOException;
 import java.text.NumberFormat;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
-import com.google.api.client.googleapis.media.MediaHttpUploader;
+
 
 public class FileDownloadProgressListener implements MediaHttpDownloaderProgressListener {
 

@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.gdrive.desktop.client.Global.ServiceManager;
-import com.gdrive.desktop.client.Global.ServiceManager.serviceType;
 import com.google.api.services.drive.model.File;
 
 /*
@@ -15,7 +14,8 @@ import com.google.api.services.drive.model.File;
  */
 /**
  * <p>
- * represent Tree Node Info in drive tree structure
+ * represent Tree Node Info in drive tree structure and provide all necessary Wrapper for 
+ * your custom implementation of TreeModel's Abstract Method
  * </p>
  * 
  * @author harsh

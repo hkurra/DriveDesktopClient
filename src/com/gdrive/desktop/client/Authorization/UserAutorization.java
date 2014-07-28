@@ -1,7 +1,4 @@
-/**
- * Used for Authenticate App ID and Authorize user Credential.
- *  @author harsh
- */
+
 package com.gdrive.desktop.client.Authorization;
 
 import com.gdrive.desktop.client.Global.DriveDesktopClient;
@@ -16,6 +13,10 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Used for Authenticate App ID and Authorize user Credential.
+ *  @author harsh
+ */
 public class UserAutorization {
 	/**
 	 * <p>

@@ -132,9 +132,11 @@ private static void CreateDirectoryStructure()
 
   /**
    * create treeNodeInfo for File 
+   * 
+   * You May Not need it
  * @param driveFileRef
  * @param parentNodeInfo
- * @return
+ * @return TreeNodeInfo
  */
 public static TreeNodeInfo FileProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
   {
@@ -153,9 +155,11 @@ public static TreeNodeInfo FileProcessing(File driveFileRef, TreeNodeInfo parent
 
   /**
    * create treeNodeInfo for Folder
+   * 
+   * You May Not need it 
  * @param driveFileRef
  * @param parentNodeInfo
- * @return
+ * @return TreeNodeInfo
  */
 public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
   {
@@ -215,12 +219,30 @@ public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo pare
     return treeNodeInfo;
   }
 
-  public static List<File> getAllFiles()
+  /**
+   * Get all Drive Files MetaData
+ * @return List<File>
+ */
+public static List<File> getAllFiles()
   {
     return mAllFiles;
   }
 
-  public static List<TreeNodeInfo> getDirectoryStructure()
+  /**
+   * Get directory structure of Drive Files
+   * <p>usage eg.	JTree jTree = new javax.swing.JTree();
+   * 				TreeNodeInfo rootNode = GDriveFiles.createDummyNode("Your RootNode Name", true);
+   * 				rootNode.put(GDriveFiles.CHILD_KEY, GDriveFiles.getDirectoryStructure);
+   * 				//Write your own custom data model implementing swings TreeModel
+   * 				//Wrapper for All necessary Abstract Method You need to implement for TreeModel are available under TreeNodeInfo 
+   * 				//Just call them blindly like:   getIndexOfChild { TreeNodeInfo treeInfo  = (TreeNodeInfo)parent;
+   *    											return treeInfo.getIndexOfChild((TreeNodeInfo) child);}
+   *            	CustomDataModel treeDataModel = new CustomDataModel(rootNode);
+   *             	jTree.setModel(treeDataModel);
+   *             
+ * @return List<TreeNodeInfo>
+ */
+public static List<TreeNodeInfo> getDirectoryStructure()
   {
     return mDirectoryStructure;
   }
@@ -292,14 +314,24 @@ public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo pare
     return searchFile;
   }
 
-  public static TreeNodeInfo getFileTreeNodeInfo(String fileId)
+  /**
+   * get TreeNodeInfo for any file if it exist under tree 
+ * @param fileId
+ * @return TreeNodeInfo
+ */
+public static TreeNodeInfo getFileTreeNodeInfo(String fileId)
   {
-    return (TreeNodeInfo)mAllFileTreeNodeInfo.get(fileId);
+    return (TreeNodeInfo)(mAllFileTreeNodeInfo.get(fileId));
   }
   
-  public static TreeNodeInfo getFileParentTreeNodeInfo(String fileId)
+  /**
+   * get Parent TreeNodeInfo for any File if it exist under tree
+ * @param fileId
+ * @return
+ */
+public static TreeNodeInfo getFileParentTreeNodeInfo(String fileId)
   {
-    return (TreeNodeInfo)mAllFileParentTreeNodeInfo.get(fileId);
+    return (TreeNodeInfo)(mAllFileParentTreeNodeInfo.get(fileId));
   }
 
   private static void setAllFiles(List<File> allFiles)
@@ -311,7 +343,17 @@ public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo pare
   {
     mDirectoryStructure = directoryStructure;
   }
-  private static TreeNodeInfo createDummyNode(String rootNodename, boolean isFolder) {
+  /**
+   * <p>used to crate Dummy Node Which either does Not exist at Drive
+   * or does not have File ID like Trashed Node(May be i am wrong) Or you
+   * own root node
+   * </p> 
+   * 
+ * @param rootNodename
+ * @param isFolder
+ * @return
+ */
+public static TreeNodeInfo createDummyNode(String rootNodename, boolean isFolder) {
     TreeNodeInfo rootNode = new TreeNodeInfo();
     File rootNodeDummyFile = new File();
 
@@ -349,32 +391,50 @@ public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo pare
 	      }
 	   return underMYdrive;
    }
-  public static void setMyDriveDirectoryStructure(List<TreeNodeInfo> myDriveDirectoryStructure)
+  /**
+ * @param myDriveDirectoryStructure
+ */
+public static void setMyDriveDirectoryStructure(List<TreeNodeInfo> myDriveDirectoryStructure)
   {
     mMyDriveDirectoryStructure = myDriveDirectoryStructure;
   }
 
-  public static List<TreeNodeInfo> getMyDriveDirectoryStructure()
+  /**
+ * @return
+ */
+public static List<TreeNodeInfo> getMyDriveDirectoryStructure()
   {
     return mMyDriveDirectoryStructure;
   }
 
-  public static void setTrashedDirectoryStructure(List<TreeNodeInfo> trashedDirectoryStructure)
+  /**
+ * @param trashedDirectoryStructure
+ */
+public static void setTrashedDirectoryStructure(List<TreeNodeInfo> trashedDirectoryStructure)
   {
     mTrashedDirectoryStructure = trashedDirectoryStructure;
   }
 
-  public static TreeNodeInfo getMyDriveRootNode()
+  /**
+ * @return
+ */
+public static TreeNodeInfo getMyDriveRootNode()
   {
     return mMyDriveRootNode;
   }
   
-  public static TreeNodeInfo getTrashedRootNode()
+  /**
+ * @return
+ */
+public static TreeNodeInfo getTrashedRootNode()
   {
     return mTrashedRootNode;
   }
   
-  public static List<TreeNodeInfo> getTrashedDirectoryStructure()
+  /**
+ * @return
+ */
+public static List<TreeNodeInfo> getTrashedDirectoryStructure()
   {
     return mTrashedDirectoryStructure;
   }
