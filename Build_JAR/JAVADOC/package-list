@@ -1,0 +1,7 @@
+Main
+com.gdrive.desktop.client.Authorization
+com.gdrive.desktop.client.FileOperation
+com.gdrive.desktop.client.Global
+com.gdrive.desktop.client.Global.ResponderData
+com.gdrive.desktop.client.ProgressListoner
+com.gdrive.desktop.client.cache
