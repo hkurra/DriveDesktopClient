@@ -35,6 +35,9 @@ import com.google.api.services.drive.model.ParentReference;
  */
 
 public class UploadCommand extends ICommand {
+	{
+		mCommandType = "UPLOAD";
+	}
 	private String mParentID = null;
 
 	private String mMimeType = null;
@@ -99,8 +102,7 @@ public class UploadCommand extends ICommand {
 			fileMetadata.setDescription(getFileDescription());
 			fileMetadata.setMimeType(getMimeType());
 
-			if ((this.mParentID != null) && !this.mParentID.equals("-1")
-					&& (this.mParentID.length() > 0)) {
+			if (isValidParentID()) {
 				fileMetadata.setParents(Arrays
 						.asList(new ParentReference[] { new ParentReference()
 								.setId(this.mParentID) }));
@@ -133,9 +135,10 @@ public class UploadCommand extends ICommand {
 								.execute()).booleanValue())
 					break;
 				TreeNodeInfo uplodedFileTreeNodeInfo = null;
-				if (this.mParentID == null) {
+				if (this.mParentID == null
+						|| this.mParentID == GDriveFiles.MYDRIVE_ROOT_NODE_ID) {
 					uplodedFileTreeNodeInfo = GDriveFiles
-							.FileProcessing(getUploadedFile(),
+					.FileProcessing(getUploadedFile(),
 									GDriveFiles.getMyDriveRootNode());
 					List<TreeNodeInfo> directoryStructure = GDriveFiles
 							.getMyDriveDirectoryStructure();
@@ -217,11 +220,12 @@ public class UploadCommand extends ICommand {
 	}
 
 	public int PostExecute() {
+		//Check status in After upload callback on failure status is false 
 		ServiceManager.ExecuteResponders(
 				ServiceManager.serviceType.AFTER_UPLOAD_SERVICE_ID,
 				new AfterFileUploadRespoderData(this, this.mUploadedFile));
 
-		if (!status) {
+		if (!mStatus) {
 			return 0;
 		}
 		if (isDeleteFile()) {
@@ -308,7 +312,7 @@ public class UploadCommand extends ICommand {
 		this.mUploadedFile = UploadedFile;
 		
 		if (UploadedFile == null) {
-			status = false;
+			mStatus = false;
 		}
 		return Boolean.valueOf(UploadedFile != null);
 	}
@@ -350,5 +354,17 @@ public class UploadCommand extends ICommand {
 				uploader.setChunkSize(MediaHttpUploader.MINIMUM_CHUNK_SIZE);
 			}
 		}
+	}
+	
+	private boolean isValidParentID() {
+		boolean isValidParent = false;
+		
+		isValidParent = (this.mParentID != null) && (!this.mParentID.equals("-1"))
+				&& (this.mParentID.length() > 0) && (!this.mParentID.equals(GDriveFiles.MYDRIVE_ROOT_NODE_ID)) &&
+						(!this.mParentID.equals(GDriveFiles.TRASHED_ROOT_NODE_ID)); 
+			
+		
+		
+		return isValidParent;
 	}
 }

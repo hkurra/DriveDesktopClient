@@ -28,7 +28,10 @@ public class CopyCommand extends ICommand {
 	 * Drive file (for setting metadata)
 	 */
 	private File mCopiedFile;
-	
+
+	{
+		mCommandType = "COPY";
+	}
 	/**
 	 * @param originFileId
 	 */
@@ -73,7 +76,7 @@ public class CopyCommand extends ICommand {
 	@Override
 	protected int Execute() throws Exception {
 	    try {
-	      Result = DriveDesktopClient.DRIVE.files().copy(mOrigionFileId, mCopiedFile).execute();
+	      mResult = DriveDesktopClient.DRIVE.files().copy(mOrigionFileId, mCopiedFile).execute();
 	    } 
 	    catch (IOException e) {
 	      System.out.println( DriveDesktopClient.MY_RESOURCE.getString("GENERELIZED_ERROR")+ e);

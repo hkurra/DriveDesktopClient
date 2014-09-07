@@ -7,23 +7,51 @@ import com.google.api.services.drive.model.File;
 
 public class AfterFileUploadRespoderData implements IBaseResponderData {
 	public AfterFileUploadRespoderData(UploadCommand UploadCommandData, File Uplodedfile) {
-		mUploadCommandData = UploadCommandData;
-		mFile  = Uplodedfile;
+		setUploadCommandData(UploadCommandData);
+		setFile(Uplodedfile);
 	}
 	
 	/**
-	 * Input file 
+	 * uploaded Command 
 	 */
-	public UploadCommand mUploadCommandData;;
+	private UploadCommand mUploadCommandData;;
 	
 	/**
 	 * uploaded File
 	 */
-	public File mFile;
+	private File mFile;
 
 	@Override
 	public serviceType getResponderServiceType() {
 		return ServiceManager.serviceType.AFTER_UPLOAD_SERVICE_ID;
+	}
+
+	/**
+	 * @param mUploadCommandData the mUploadCommandData to set
+	 */
+	public void setUploadCommandData(UploadCommand mUploadCommandData) {
+		this.mUploadCommandData = mUploadCommandData;
+	}
+
+	/**
+	 * @return the mUploadCommandData
+	 */
+	public UploadCommand getUploadCommandData() {
+		return mUploadCommandData;
+	}
+
+	/**
+	 * @param mFile the mFile to set
+	 */
+	public void setFile(File mFile) {
+		this.mFile = mFile;
+	}
+
+	/**
+	 * @return the mFile
+	 */
+	public File getFile() {
+		return mFile;
 	}
 		
 }

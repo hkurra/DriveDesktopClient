@@ -14,6 +14,9 @@ import com.google.api.services.drive.model.File;
 
 public class DownloadCommand extends ICommand {
 
+	{
+		mCommandType = "DOWNLOAD";
+	}
 	
 	/**
 	 * file to download

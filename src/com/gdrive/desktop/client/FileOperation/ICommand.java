@@ -7,9 +7,10 @@ package com.gdrive.desktop.client.FileOperation;
  */
 public abstract class ICommand
 {
-  protected Object Result = null;
-  protected Boolean status = true;
-  protected Exception exception = null;
+  protected Object mResult = null;
+  protected Boolean mStatus = true;
+  protected Exception mException = null;
+  protected String mCommandType = "NONE";
 
   /**
    * <p>Use to execute Command Which don't provide post listener(post Execute callback)
@@ -27,8 +28,8 @@ public void DoExcute() throws  Exception
     }
     catch (Exception e)
     {	
-    	status = false;
-    	exception = e;
+    	mStatus = false;
+    	mException = e;
       e.printStackTrace();
       throw e;
     }
@@ -51,8 +52,8 @@ public void DoExcute1()
     }
     catch (Exception e)
     {	
-    	status = false;
-    	exception = e;
+    	mStatus = false;
+    	mException = e;
       e.printStackTrace();
     }
     finally {
@@ -68,8 +69,9 @@ public void DoExcute1()
 
   protected abstract int PostExecute();
 
-  public Object getResult()
+  public Object GetResult()
   {
-    return this.Result;
+    return this.mResult;
   }
+  public String GetCommandType(){return mCommandType;}
 }

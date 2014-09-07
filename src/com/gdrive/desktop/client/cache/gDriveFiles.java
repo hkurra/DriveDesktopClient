@@ -39,16 +39,29 @@ public class GDriveFiles
   public static final String CHILD_KEY = "CHILD";
   public static final String REVISION = "REVISION";
 
+  public static final String MYDRIVE_ROOT_NODE_ID = "MyDriveRootNode";
+  public static final String TRASHED_ROOT_NODE_ID = "TrashedRootNode";
+  
   static
   {
 	  mAllFileParentTreeNodeInfo = new HashMap<String, TreeNodeInfo>();
 	  mAllFileTreeNodeInfo = new HashMap<String, TreeNodeInfo>();
 	  mMyDriveRootNode = createDummyNode("MY Drive", true);
 	  mTrashedRootNode = createDummyNode("Trashed", true);
+
     setMyDriveDirectoryStructure(new ArrayList<TreeNodeInfo>());
     setTrashedDirectoryStructure(new ArrayList<TreeNodeInfo>());
     setAllFiles(new ArrayList<File>());
     setDirectoryStructure(new ArrayList<TreeNodeInfo>());
+    
+		mMyDriveRootNode.put(FILE_ID_KEY, MYDRIVE_ROOT_NODE_ID);
+		mTrashedRootNode.put(FILE_ID_KEY, TRASHED_ROOT_NODE_ID);
+		
+	    mAllFileTreeNodeInfo.put(MYDRIVE_ROOT_NODE_ID, mMyDriveRootNode);
+	    mAllFileTreeNodeInfo.put(TRASHED_ROOT_NODE_ID, mTrashedRootNode);
+	    
+		
+	  
   }
 
   /**

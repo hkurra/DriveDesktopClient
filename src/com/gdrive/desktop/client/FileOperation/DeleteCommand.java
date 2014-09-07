@@ -20,6 +20,9 @@ import com.google.api.services.drive.model.File;
  */
 public class DeleteCommand extends ICommand {
 
+	{
+		mCommandType = "DELETE";
+	}
 	/**
 	 * Fileid of file to be delete
 	 */
@@ -113,7 +116,7 @@ public class DeleteCommand extends ICommand {
 		do {
 		try {
 		if (mTrash && !mIsTrashed) {
-			Result = DriveDesktopClient.DRIVE.files().trash(mFileID).execute();
+			mResult = DriveDesktopClient.DRIVE.files().trash(mFileID).execute();
 			TreeNodeInfo ParentNode = GDriveFiles.getFileParentTreeNodeInfo(mFileID);
 			ParentNode.deleteChildren(GDriveFiles.getFileTreeNodeInfo(mFileID));
 			GDriveFiles.getTrashedDirectoryStructure().add(mIsFolder ? 
@@ -122,10 +125,10 @@ public class DeleteCommand extends ICommand {
 		}
 		
 		else if(mDeleteRevision) {
-			Result = DriveDesktopClient.DRIVE.revisions().delete(mFileID, mRevisionID).execute();
+			mResult = DriveDesktopClient.DRIVE.revisions().delete(mFileID, mRevisionID).execute();
 		}
 		else if (!mTrash)  {
-			Result = DriveDesktopClient.DRIVE.files().delete(mFileID).execute();
+			mResult = DriveDesktopClient.DRIVE.files().delete(mFileID).execute();
 			TreeNodeInfo ParentNode = GDriveFiles.getFileParentTreeNodeInfo(mFileID);
 			ParentNode.deleteChildren(GDriveFiles.getFileTreeNodeInfo(mFileID));
 		}
