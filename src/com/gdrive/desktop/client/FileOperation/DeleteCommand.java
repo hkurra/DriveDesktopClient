@@ -82,7 +82,7 @@ public class DeleteCommand extends ICommand {
 	 * @see FileOperation.gCommand#IsExecutable()
 	 */
 	@Override
-	public Boolean IsExecutable() {
+	public Boolean isExecutable() {
 		boolean isExecutable = true;
 		if (mFileID == null && mFile == null && mFile.getId() == null && (mRevisionID == null && mFileID == null)) {
 			isExecutable = false; 
@@ -94,7 +94,7 @@ public class DeleteCommand extends ICommand {
 	 * @see FileOperation.gCommand#PreExecute()
 	 */
 	@Override
-	protected int PreExecute() {
+	protected int preExecute() {
 		mIsFolder = (Boolean)GDriveFiles.getFileTreeNodeInfo(mFileID).get(GDriveFiles.IS_FOLDER_KEY);
 		
 		if (mTrash == null) {
@@ -112,7 +112,7 @@ public class DeleteCommand extends ICommand {
 	 * @see FileOperation.gCommand#Execute()
 	 */
 	@Override
-	protected int Execute() throws Exception {
+	protected int execute() throws Exception {
 		do {
 		try {
 		if (mTrash && !mIsTrashed) {
@@ -120,8 +120,8 @@ public class DeleteCommand extends ICommand {
 			TreeNodeInfo ParentNode = GDriveFiles.getFileParentTreeNodeInfo(mFileID);
 			ParentNode.deleteChildren(GDriveFiles.getFileTreeNodeInfo(mFileID));
 			GDriveFiles.getTrashedDirectoryStructure().add(mIsFolder ? 
-					GDriveFiles.FolderProcessing(mFile, GDriveFiles.getTrashedRootNode()) : 
-						GDriveFiles.FileProcessing(mFile, GDriveFiles.getTrashedRootNode()));
+					GDriveFiles.folderProcessing(mFile, GDriveFiles.getTrashedRootNode()) : 
+						GDriveFiles.fileProcessing(mFile, GDriveFiles.getTrashedRootNode()));
 		}
 		
 		else if(mDeleteRevision) {
@@ -144,7 +144,7 @@ public class DeleteCommand extends ICommand {
 	 * @see FileOperation.gCommand#PostExecute()
 	 */
 	@Override
-	protected int PostExecute() {
+	protected int postExecute() {
 		
 	    ServiceManager.ExecuteResponders(
 	    	      ServiceManager.serviceType.AFTER_FILE_DELETE_SERVICE_ID, 

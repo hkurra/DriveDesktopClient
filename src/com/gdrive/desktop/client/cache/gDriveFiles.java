@@ -98,7 +98,7 @@ public static void CacheAllFiles()
       getMyDriveDirectoryStructure().clear();
       getTrashedDirectoryStructure().clear();
     }
-    CreateDirectoryStructure();
+    createDirectoryStructure();
 
     mMyDriveRootNode.put("CHILD", getMyDriveDirectoryStructure());
     mTrashedRootNode.put("CHILD", getTrashedDirectoryStructure());
@@ -111,7 +111,7 @@ public static void CacheAllFiles()
   /**
  * create Directory structure for all derive files
  */
-private static void CreateDirectoryStructure()
+private static void createDirectoryStructure()
   {
     for (int index = 0; index < getAllFiles().size(); index++) {
       List<ParentReference> parentList = ((File)getAllFiles().get(index))
@@ -123,23 +123,23 @@ private static void CreateDirectoryStructure()
       if (((File)getAllFiles().get(index)).getMimeType().equals(DriveDesktopClient.FOLDER_MIME_TYPE))
       {
         if ((currentFile.getExplicitlyTrashed() != null) && (currentFile.getExplicitlyTrashed().booleanValue())) {
-          getTrashedDirectoryStructure().add(FolderProcessing(
+          getTrashedDirectoryStructure().add(folderProcessing(
             (File)getAllFiles()
             .get(index), mTrashedRootNode));
         }
         else {
-          getMyDriveDirectoryStructure().add(FolderProcessing(
+          getMyDriveDirectoryStructure().add(folderProcessing(
             (File)getAllFiles()
             .get(index), mMyDriveRootNode));
         }
 
       }
       else if ((currentFile.getExplicitlyTrashed() != null) && (currentFile.getExplicitlyTrashed().booleanValue())) {
-        getTrashedDirectoryStructure().add(FileProcessing((File)getAllFiles().get(index), mTrashedRootNode));
+        getTrashedDirectoryStructure().add(fileProcessing((File)getAllFiles().get(index), mTrashedRootNode));
       }
       else
         getMyDriveDirectoryStructure().add(
-          FileProcessing((File)getAllFiles().get(index), mMyDriveRootNode));
+          fileProcessing((File)getAllFiles().get(index), mMyDriveRootNode));
     }
   }
 
@@ -151,7 +151,7 @@ private static void CreateDirectoryStructure()
  * @param parentNodeInfo
  * @return TreeNodeInfo
  */
-public static TreeNodeInfo FileProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
+public static TreeNodeInfo fileProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
   {
 	String fileID = driveFileRef.getId();
     TreeNodeInfo treeNodeInfo = new TreeNodeInfo();
@@ -174,7 +174,7 @@ public static TreeNodeInfo FileProcessing(File driveFileRef, TreeNodeInfo parent
  * @param parentNodeInfo
  * @return TreeNodeInfo
  */
-public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
+public static TreeNodeInfo folderProcessing(File driveFileRef, TreeNodeInfo parentNodeInfo)
   {
     TreeNodeInfo treeNodeInfo = new TreeNodeInfo();
     treeNodeInfo.put("SELF", driveFileRef);
@@ -203,11 +203,11 @@ public static TreeNodeInfo FolderProcessing(File driveFileRef, TreeNodeInfo pare
           Boolean isFallUnderTrashedDirStruct = Boolean.valueOf((!isParentTrashed.booleanValue()) && (isFileTrashded.booleanValue()));
           boolean testVar;
           if (childFileRef.getMimeType().equals(DriveDesktopClient.FOLDER_MIME_TYPE)) {
-            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(FolderProcessing(childFileRef, treeNodeInfo)) : childList.add(FolderProcessing(childFileRef, treeNodeInfo));
+            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(folderProcessing(childFileRef, treeNodeInfo)) : childList.add(folderProcessing(childFileRef, treeNodeInfo));
           }
           else
           {
-            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(FileProcessing(childFileRef, treeNodeInfo)) : childList.add(FileProcessing(childFileRef, treeNodeInfo));
+            testVar = isFallUnderTrashedDirStruct.booleanValue() ? getTrashedDirectoryStructure().add(fileProcessing(childFileRef, treeNodeInfo)) : childList.add(fileProcessing(childFileRef, treeNodeInfo));
           }
           if(testVar == false) {
     

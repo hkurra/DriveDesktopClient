@@ -47,19 +47,19 @@ public class DownloadCommand extends ICommand {
 	}
 	
 	@Override
-	public Boolean IsExecutable() {
+	public Boolean isExecutable() {
 		
 		return true;
 	}
 
 	@Override
-	protected int PreExecute() {
+	protected int preExecute() {
 		
 		return 0;
 	}
 
 	@Override
-	protected int Execute() throws Exception {
+	protected int execute() throws Exception {
 		
 	    if (mFileToDownload.getDownloadUrl() != null && mFileToDownload.getDownloadUrl().length() > 0) {
 	        try {
@@ -93,7 +93,7 @@ public class DownloadCommand extends ICommand {
 	}
 
 	@Override
-	protected int PostExecute() {
+	protected int postExecute() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

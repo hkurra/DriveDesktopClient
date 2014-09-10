@@ -44,7 +44,7 @@ public class CopyCommand extends ICommand {
 	 * @see FileOperation.gCommand#IsExecutable()
 	 */
 	@Override
-	public Boolean IsExecutable() {
+	public Boolean isExecutable() {
 		return true;
 	}
 
@@ -52,7 +52,7 @@ public class CopyCommand extends ICommand {
 	 * @see FileOperation.gCommand#PreExecute()
 	 */
 	@Override
-	protected int PreExecute() {
+	protected int preExecute() {
 		
 		String defaultTitle =  GDriveFiles.searchFileID(mOrigionFileId, false, false).getTitle();
 	
@@ -74,7 +74,7 @@ public class CopyCommand extends ICommand {
 	 * @see FileOperation.gCommand#Execute()
 	 */
 	@Override
-	protected int Execute() throws Exception {
+	protected int execute() throws Exception {
 	    try {
 	      mResult = DriveDesktopClient.DRIVE.files().copy(mOrigionFileId, mCopiedFile).execute();
 	    } 
@@ -89,7 +89,7 @@ public class CopyCommand extends ICommand {
 	 * @see FileOperation.gCommand#PostExecute()
 	 */
 	@Override
-	protected int PostExecute() {
+	protected int postExecute() {
 		return 0;
 	}
 

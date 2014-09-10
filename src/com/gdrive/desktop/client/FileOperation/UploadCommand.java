@@ -94,7 +94,7 @@ public class UploadCommand extends ICommand {
 		setLocalDiskFile(new java.io.File(getGDriveFile().getFilePath()));
 	}
 
-	public int Execute() throws Exception {
+	public int execute() throws Exception {
 		try {
 			com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
 
@@ -138,7 +138,7 @@ public class UploadCommand extends ICommand {
 				if (this.mParentID == null
 						|| this.mParentID == GDriveFiles.MYDRIVE_ROOT_NODE_ID) {
 					uplodedFileTreeNodeInfo = GDriveFiles
-					.FileProcessing(getUploadedFile(),
+					.fileProcessing(getUploadedFile(),
 									GDriveFiles.getMyDriveRootNode());
 					List<TreeNodeInfo> directoryStructure = GDriveFiles
 							.getMyDriveDirectoryStructure();
@@ -151,7 +151,7 @@ public class UploadCommand extends ICommand {
 				} else {
 					TreeNodeInfo parentNodeInfo = GDriveFiles
 							.getFileTreeNodeInfo(this.mParentID);
-					uplodedFileTreeNodeInfo = GDriveFiles.FileProcessing(
+					uplodedFileTreeNodeInfo = GDriveFiles.fileProcessing(
 							getUploadedFile(), parentNodeInfo);
 					if (parentNodeInfo == null)
 						break;
@@ -191,7 +191,7 @@ public class UploadCommand extends ICommand {
 		return 0;
 	}
 
-	public int PreExecute() {
+	public int preExecute() {
 		if ((getLocalDiskFile().isDirectory()) || (isFolder())) {
 			setMimeType(DriveDesktopClient.FOLDER_MIME_TYPE);
 			setFolder(true);
@@ -219,7 +219,7 @@ public class UploadCommand extends ICommand {
 		return 0;
 	}
 
-	public int PostExecute() {
+	public int postExecute() {
 		//Check status in After upload callback on failure status is false 
 		ServiceManager.ExecuteResponders(
 				ServiceManager.serviceType.AFTER_UPLOAD_SERVICE_ID,
@@ -238,7 +238,7 @@ public class UploadCommand extends ICommand {
 		return 0;
 	}
 
-	public Boolean IsExecutable() {
+	public Boolean isExecutable() {
 		boolean isExecutable = false;
 		if (UploadOperation.NEW_REVISION == getUploadOperation()
 				|| UploadOperation.NEW_UPLOAD == getUploadOperation()) {

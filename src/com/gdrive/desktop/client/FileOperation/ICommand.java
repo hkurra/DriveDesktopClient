@@ -17,13 +17,13 @@ public abstract class ICommand
    * or if you dont register your post listener and still want to know execption</p>
  * @throws Exception
  */
-public void DoExcute() throws  Exception
+public void doExcute() throws  Exception
   {
     try
     {
-      PreExecute();
+      preExecute();
 
-      Execute();
+      execute();
 
     }
     catch (Exception e)
@@ -34,20 +34,20 @@ public void DoExcute() throws  Exception
       throw e;
     }
     finally {
-    	PostExecute();
+    	postExecute();
     }
   }
 
   /**
  * 
  */
-public void DoExcute1()
+public void doExcute1()
   {
     try
     {
-      PreExecute();
+      preExecute();
 
-      Execute();
+      execute();
 
     }
     catch (Exception e)
@@ -57,21 +57,21 @@ public void DoExcute1()
       e.printStackTrace();
     }
     finally {
-    	PostExecute();
+    	postExecute();
     }
   }
-  public abstract Boolean IsExecutable();
+  public abstract Boolean isExecutable();
 
-  protected abstract int PreExecute();
+  protected abstract int preExecute();
 
-  protected abstract int Execute()
+  protected abstract int execute()
     throws Exception;
 
-  protected abstract int PostExecute();
+  protected abstract int postExecute();
 
-  public Object GetResult()
+  public Object getResult()
   {
     return this.mResult;
   }
-  public String GetCommandType(){return mCommandType;}
+  public String getCommandType(){return mCommandType;}
 }
