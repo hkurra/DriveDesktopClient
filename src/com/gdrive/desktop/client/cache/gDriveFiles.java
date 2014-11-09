@@ -224,9 +224,6 @@ public static TreeNodeInfo folderProcessing(File driveFileRef, TreeNodeInfo pare
     while ((request.getPageToken() != null) && 
       (request.getPageToken().length() > 0));
 
-    if (childList.size() == 0) {
-      childList.add(createDummyNode("Empty", false));
-    }
     treeNodeInfo.addChildNodes(childList);
     
     mAllFileTreeNodeInfo.put(driveFileRef.getId(), treeNodeInfo);

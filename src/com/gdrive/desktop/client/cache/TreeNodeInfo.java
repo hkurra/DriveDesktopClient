@@ -126,6 +126,7 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 		List<TreeNodeInfo> childList =  getChildNodes();
 		if (childList == null) {
 			childList = new ArrayList<TreeNodeInfo>();
+            addChildNodes(childList);
 		}
 		if (childList.add(child) && !silentAdd) {
 			ServiceManager.ExecuteResponders(ServiceManager.serviceType.ADD_NEW_NODE_SERVICE_ID, new AddNewNodeResponderData());

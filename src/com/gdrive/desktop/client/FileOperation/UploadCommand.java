@@ -127,8 +127,10 @@ public class UploadCommand extends ICommand {
 				Drive.Files.Insert insert = isFolder() ? DriveDesktopClient.DRIVE
 						.files().insert(fileMetadata) : DriveDesktopClient.DRIVE
 						.files().insert(fileMetadata, fileContent);
-
-				enableProgressListoner(insert.getMediaHttpUploader());
+						
+				if (!isFolder()) {
+					enableProgressListoner(insert.getMediaHttpUploader());
+				}
 
 				if (!setUploadedFile(
 						(com.google.api.services.drive.model.File) insert
@@ -157,7 +159,10 @@ public class UploadCommand extends ICommand {
 						break;
 					parentNodeInfo.addChild(uplodedFileTreeNodeInfo, false);
 				}
-
+				
+				if (isFolder()) {
+					uplodedFileTreeNodeInfo.put(GDriveFiles.IS_FOLDER_KEY, true);
+				}
 				break;
 			case PATCH:
 				setUploadedFile((com.google.api.services.drive.model.File) DriveDesktopClient.DRIVE
