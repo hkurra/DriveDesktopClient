@@ -13,12 +13,12 @@ of get authorization from User.
 #Using this you can replicate google drive UI structure & perform above mention operation on it in your java application.
 
 #build pre requisite
-1)java 7 sdk 
-2)maven build environment
+* java 7 sdk 
+* maven build environment
 
 #compiling instruction
-1)download zip file & Unzip it
-2)perform maven install i.e "mvn install" from command line
+* download zip file & Unzip it
+* perform maven install i.e "mvn install" from command line
 
 #using instruction 
 *javaDocs are available under Build_jar/javadoc folder
@@ -31,6 +31,6 @@ of get authorization from User.
   }
   
 #sample 
-1)UI project which is using this library available under sample repository 
-3)sample project's executabel jar available under "dist" folder so backup it before clean build this sample project
-2)sample project is Netbeans project 
+* UI project which is using this library available under sample repository 
+* sample project's executabel jar available under "dist" folder so backup it before clean build this sample project
+* sample project is Netbeans project 
