@@ -163,6 +163,9 @@ public static TreeNodeInfo fileProcessing(File driveFileRef, TreeNodeInfo parent
     mAllFileTreeNodeInfo.put(fileID, treeNodeInfo);
     mAllFileParentTreeNodeInfo.put(fileID, parentNodeInfo);
     
+    if(!getAllFiles().contains(driveFileRef)) {
+    	getAllFiles().add(driveFileRef);
+    };
     return treeNodeInfo;
   }
 

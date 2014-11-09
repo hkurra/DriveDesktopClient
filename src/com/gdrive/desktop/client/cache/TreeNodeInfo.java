@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.gdrive.desktop.client.Global.ServiceManager;
+import com.gdrive.desktop.client.Global.ResponderData.AddNewNodeResponderData;
 import com.google.api.services.drive.model.File;
 
 /*
@@ -95,9 +96,11 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 		childList.remove(childIndex);
 		
 		String fileID = (String) child.get(GDriveFiles.FILE_ID_KEY);
+		File file = (File) child.get(GDriveFiles.SELF_KEY);
 				
 		GDriveFiles.removeTreeNodeRefrence(fileID);
 		GDriveFileRevisions.deleteRevision(fileID);
+		GDriveFiles.getAllFiles().remove(file);
 	}
 
 	/**
@@ -125,7 +128,7 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 			childList = new ArrayList<TreeNodeInfo>();
 		}
 		if (childList.add(child) && !silentAdd) {
-			ServiceManager.ExecuteResponders(ServiceManager.serviceType.ADD_NEW_NODE_SERVICE_ID, null);
+			ServiceManager.ExecuteResponders(ServiceManager.serviceType.ADD_NEW_NODE_SERVICE_ID, new AddNewNodeResponderData());
 		}
 	}
 	

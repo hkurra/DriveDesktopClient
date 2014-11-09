@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import com.gdrive.desktop.client.Global.DriveDesktopClient;
 import com.gdrive.desktop.client.cache.GDriveFiles;
+import com.gdrive.desktop.client.cache.TreeNodeInfo;
 import com.google.api.services.drive.model.File;
 
 /**
@@ -77,7 +78,12 @@ public class CopyCommand extends ICommand {
 	protected int execute() throws Exception {
 	    try {
 	      mResult = DriveDesktopClient.DRIVE.files().copy(mOrigionFileId, mCopiedFile).execute();
+	      TreeNodeInfo parentNodeInfo = GDriveFiles.getFileParentTreeNodeInfo(mOrigionFileId);
+	      TreeNodeInfo copiedNodeInfo = GDriveFiles.fileProcessing(mCopiedFile, parentNodeInfo);
+	      
+	      parentNodeInfo.addChild(copiedNodeInfo, false);
 	    } 
+	    
 	    catch (IOException e) {
 	      System.out.println( DriveDesktopClient.MY_RESOURCE.getString("GENERELIZED_ERROR")+ e);
 	      throw e;
