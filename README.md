@@ -22,11 +22,11 @@ of get authorization from User.
 
 #using instruction 
 *javaDocs are available under Build_jar/javadoc folder
-*minimum code required to set up ths library
+* minimum code required to set up ths library
 * DriveDesktopClient.CLIENT_ID = "YOUR CLIENT ID";
-  DriveDesktopClient.CLIENT_SECRET = "YOUR CLIENT SECRET";
-  DriveDesktopClient.APPLICATION_NAME = "YOUR APPLICATION NAME";
-  if (DriveDesktopClient.setUpGDrive()){
+* DriveDesktopClient.CLIENT_SECRET = "YOUR CLIENT SECRET";
+* DriveDesktopClient.APPLICATION_NAME = "YOUR APPLICATION NAME";
+* if (DriveDesktopClient.setUpGDrive()){
 	//Set Up your Application
   }
   
