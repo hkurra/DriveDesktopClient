@@ -19,8 +19,17 @@ of get authorization from User.
 #compiling instruction
 1)download zip file & Unzip it
 2)perform maven install i.e "mvn install" from command line
-3)library is build
 
+#using instruction 
+*javaDocs are available under Build_jar/javadoc folder
+*minimum code required to set up ths library
+* DriveDesktopClient.CLIENT_ID = "YOUR CLIENT ID";
+  DriveDesktopClient.CLIENT_SECRET = "YOUR CLIENT SECRET";
+  DriveDesktopClient.APPLICATION_NAME = "YOUR APPLICATION NAME";
+  if (DriveDesktopClient.setUpGDrive()){
+	//Set Up your Application
+  }
+  
 #sample 
 1)UI project which is using this library available under sample repository 
 3)sample project's executabel jar available under "dist" folder so backup it before clean build this sample project
