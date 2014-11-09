@@ -1,7 +1,7 @@
 DriveDesktopClient
 ==================
 
-#java helper Library provide Model part for google drive tree node structure & file operation on it like
+#java helper Library provide Modal part for google drive tree node structure & file operation on it like.
 1)upload new file/folder
 2)Trash/delete file
 3)copy file
@@ -22,5 +22,6 @@ of get authorization from User.
 3)library is build
 
 #sample 
-1)UI project which is using this library available under sample repository
+1)UI project which is using this library available under sample repository 
+3)sample project's executabel jar available under "dist" folder so backup it before clean build this sample project
 2)sample project is Netbeans project 
