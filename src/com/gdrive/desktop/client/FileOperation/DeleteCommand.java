@@ -3,8 +3,6 @@
  */
 package com.gdrive.desktop.client.FileOperation;
 
-
-
 import com.gdrive.desktop.client.Global.ServiceManager;
 import com.gdrive.desktop.client.Global.DriveDesktopClient;
 import com.gdrive.desktop.client.Global.ResponderData.AfterFileDeleteResponderData;
@@ -15,8 +13,10 @@ import com.google.api.services.drive.model.File;
 /**
  * @author harsh
  * 
- * <p>Command To delete/Trash File from Google drive</p>
- *
+ *         <p>
+ *         Command To delete/Trash File from Google drive
+ *         </p>
+ * 
  */
 public class DeleteCommand extends ICommand {
 
@@ -27,26 +27,36 @@ public class DeleteCommand extends ICommand {
 	 * Fileid of file to be delete
 	 */
 	private String mFileID = null;
-	
+
 	/**
 	 * file to be delete
 	 */
 	private File mFile = null;
-	
+
 	/**
-	 * Weather to trash file or not 
+	 * Weather to trash file or not
 	 */
 	private Boolean mTrash = null;
 	/**
 	 * Revision id of file to delete
 	 */
 	private String mRevisionID = null;
-	
+
+	/**
+	 * true if you want to delete revision
+	 */
 	private boolean mDeleteRevision = false;
-	
+
+	/**
+	 * true if you want to trash it to bin
+	 */
 	private boolean mIsTrashed = false;
-	
+
+	/**
+	 * true if this command is going to operate on folder
+	 */
 	private boolean mIsFolder;
+
 	/**
 	 * @param file
 	 * @param trash
@@ -56,100 +66,114 @@ public class DeleteCommand extends ICommand {
 		mFileID = file.getId();
 		mTrash = trash;
 	}
+
 	/**
 	 * 
 	 * @param fileID
 	 * @param trash
 	 */
 	public DeleteCommand(String fileID, Boolean trash) {
-		mFileID  = fileID;
+		mFileID = fileID;
 		mFile = GDriveFiles.searchFileID(fileID, false, false);
 		mTrash = trash;
 	}
-	
+
 	/**
 	 * Delete File Revision
 	 * 
 	 * @param fileID
 	 * @param revisionID
 	 */
-	public DeleteCommand (String fileID, String revisionID) {
+	public DeleteCommand(String fileID, String revisionID) {
 		mFileID = fileID;
 		mFile = GDriveFiles.searchFileID(fileID, false, false);
 		mRevisionID = revisionID;
 	}
+
 	/*
 	 * @see FileOperation.gCommand#IsExecutable()
 	 */
 	@Override
 	public Boolean isExecutable() {
 		boolean isExecutable = true;
-		if (mFileID == null && mFile == null && mFile.getId() == null && (mRevisionID == null && mFileID == null)) {
-			isExecutable = false; 
+		if (mFileID == null && mFile == null && mFile.getId() == null
+				&& (mRevisionID == null && mFileID == null)) {
+			isExecutable = false;
 		}
 		return isExecutable;
 	}
 
-	/* 
+	/*
 	 * @see FileOperation.gCommand#PreExecute()
 	 */
 	@Override
 	protected int preExecute() {
-		mIsFolder = (Boolean)GDriveFiles.getFileTreeNodeInfo(mFileID).get(GDriveFiles.IS_FOLDER_KEY);
-		
+		mIsFolder = (Boolean) GDriveFiles.getFileTreeNodeInfo(mFileID).get(
+				GDriveFiles.IS_FOLDER_KEY);
+
 		if (mTrash == null) {
 			mTrash = false;
 		}
-		mIsTrashed = mFile.getExplicitlyTrashed() != null && mFile.getExplicitlyTrashed();
-	
+		mIsTrashed = mFile.getExplicitlyTrashed() != null
+				&& mFile.getExplicitlyTrashed();
+
 		if (mRevisionID != null) {
 			mDeleteRevision = true;
 		}
 		return 0;
 	}
 
-	/* 
+	/*
 	 * @see FileOperation.gCommand#Execute()
 	 */
 	@Override
 	protected int execute() throws Exception {
 		do {
-		try {
-		if (mTrash && !mIsTrashed) {
-			mResult = DriveDesktopClient.DRIVE.files().trash(mFileID).execute();
-			TreeNodeInfo ParentNode = GDriveFiles.getFileParentTreeNodeInfo(mFileID);
-			ParentNode.deleteChildren(GDriveFiles.getFileTreeNodeInfo(mFileID));
-			GDriveFiles.getTrashedDirectoryStructure().add(mIsFolder ? 
-					GDriveFiles.folderProcessing(mFile, GDriveFiles.getTrashedRootNode()) : 
-						GDriveFiles.fileProcessing(mFile, GDriveFiles.getTrashedRootNode()));
-		}
-		
-		else if(mDeleteRevision) {
-			mResult = DriveDesktopClient.DRIVE.revisions().delete(mFileID, mRevisionID).execute();
-		}
-		else if (!mTrash)  {
-			mResult = DriveDesktopClient.DRIVE.files().delete(mFileID).execute();
-			TreeNodeInfo ParentNode = GDriveFiles.getFileParentTreeNodeInfo(mFileID);
-			ParentNode.deleteChildren(GDriveFiles.getFileTreeNodeInfo(mFileID));
-		}
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		}while(false);
+			try {
+				if (mTrash && !mIsTrashed) {
+					mResult = DriveDesktopClient.DRIVE.files().trash(mFileID)
+							.execute();
+					TreeNodeInfo ParentNode = GDriveFiles
+							.getFileParentTreeNodeInfo(mFileID);
+					ParentNode.deleteChildren(GDriveFiles
+							.getFileTreeNodeInfo(mFileID));
+					GDriveFiles.getTrashedDirectoryStructure().add(
+							mIsFolder ? GDriveFiles.folderProcessing(mFile,
+									GDriveFiles.getTrashedRootNode())
+									: GDriveFiles.fileProcessing(mFile,
+											GDriveFiles.getTrashedRootNode()));
+				}
+
+				else if (mDeleteRevision) {
+					mResult = DriveDesktopClient.DRIVE.revisions()
+							.delete(mFileID, mRevisionID).execute();
+				} else if (!mTrash) {
+					mResult = DriveDesktopClient.DRIVE.files().delete(mFileID)
+							.execute();
+					TreeNodeInfo ParentNode = GDriveFiles
+							.getFileParentTreeNodeInfo(mFileID);
+					ParentNode.deleteChildren(GDriveFiles
+							.getFileTreeNodeInfo(mFileID));
+				}
+			} catch (Exception e) {
+				throw e;
+			}
+		} while (false);
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see FileOperation.gCommand#PostExecute()
 	 */
 	@Override
 	protected int postExecute() {
-		
-	    ServiceManager.ExecuteResponders(
-	    	      ServiceManager.serviceType.AFTER_FILE_DELETE_SERVICE_ID, 
-	    	      new AfterFileDeleteResponderData(this, this.mFile));
-		
+
+		ServiceManager.ExecuteResponders(
+				ServiceManager.serviceType.AFTER_FILE_DELETE_SERVICE_ID,
+				new AfterFileDeleteResponderData(this, this.mFile));
+
 		return 0;
 	}
 }

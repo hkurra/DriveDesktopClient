@@ -15,13 +15,18 @@ import com.google.api.services.drive.model.File;
  */
 /**
  * <p>
- * represent Tree Node Info in drive tree structure and provide all necessary Wrapper for 
- * your custom implementation of TreeModel's Abstract Method
+ * represent Tree Node Info in drive tree structure and provide all necessary
+ * Wrapper for your custom implementation of TreeModel's Abstract Method
  * </p>
  * 
  * @author harsh
  */
 public class TreeNodeInfo extends HashMap<String, Object> {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6499645208874527360L;
 
 	/**
 	 * @return
@@ -30,6 +35,7 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 		final List<TreeNodeInfo> childList = (List<TreeNodeInfo>) get(GDriveFiles.CHILD_KEY);
 		return childList;
 	}
+
 	/**
 	 * <p>
 	 * this method return child of Tree Node at index i if child exist at i else
@@ -43,7 +49,7 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 	public TreeNodeInfo getChild(final int index) {
 		TreeNodeInfo childNodeInfo = null;
 		if (get(GDriveFiles.CHILD_KEY) != null) {
-			 List<TreeNodeInfo> childList = getChildNodes();
+			List<TreeNodeInfo> childList = getChildNodes();
 			childNodeInfo = childList.get(index);
 		}
 		return childNodeInfo;
@@ -51,6 +57,7 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 
 	/**
 	 * Number of child nodes of Tree node
+	 * 
 	 * @return childCount
 	 */
 	public int getChildCount() {
@@ -64,7 +71,9 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 	}
 
 	/**
-	 * <p>this method return index of child node if it exist in Tree Node else -1</p>
+	 * <p>
+	 * this method return index of child node if it exist in Tree Node else -1
+	 * </p>
 	 * 
 	 * @param child
 	 * @return child index
@@ -85,55 +94,74 @@ public class TreeNodeInfo extends HashMap<String, Object> {
 	}
 
 	/**
-	 * <p> this method delete child of tree node if exist</p>
-	 * <p>ths also remove child from cached structure of tree node reference & file revision</p>
+	 * <p>
+	 * this method delete child of tree node if exist
+	 * </p>
+	 * <p>
+	 * ths also remove child from cached structure of tree node reference & file
+	 * revision
+	 * </p>
 	 * 
-	 * @param child node
+	 * @param child
+	 *            node
 	 */
 	public void deleteChildren(TreeNodeInfo child) {
 		int childIndex = getIndexOfChild(child);
 		final List<TreeNodeInfo> childList = getChildNodes();
 		childList.remove(childIndex);
-		
+
 		String fileID = (String) child.get(GDriveFiles.FILE_ID_KEY);
 		File file = (File) child.get(GDriveFiles.SELF_KEY);
-				
+
 		GDriveFiles.removeTreeNodeRefrence(fileID);
 		GDriveFileRevisions.deleteRevision(fileID);
 		GDriveFiles.getAllFiles().remove(file);
 	}
 
 	/**
-	 * <p>add child Nodes in TreeNode</p>
-	 * <p>replace the previous child nodes</p>
+	 * <p>
+	 * add child Nodes in TreeNode
+	 * </p>
+	 * <p>
+	 * replace the previous child nodes
+	 * </p>
 	 * 
 	 * @param childList
 	 */
 	public void addChildNodes(List<TreeNodeInfo> childList) {
 		put(GDriveFiles.CHILD_KEY, childList);
 	}
-	
+
 	/**
-	 * <p>add child in TreeNode</p>
+	 * <p>
+	 * add child in TreeNode
+	 * </p>
 	 * 
-	 * <p>if silentAdd is false update call is generated</p>
-	 * <p>register your listener for this update call<ADD_NEW_NODE_SERVICE_ID></p> 
+	 * <p>
+	 * if silentAdd is false update call is generated
+	 * </p>
+	 * <p>
+	 * register your listener for this update call<ADD_NEW_NODE_SERVICE_ID>
+	 * </p>
+	 * 
 	 * @param childList
 	 * @param silentAdd
 	 */
 	public void addChild(TreeNodeInfo child, Boolean silentAdd) {
-		
-		List<TreeNodeInfo> childList =  getChildNodes();
+
+		List<TreeNodeInfo> childList = getChildNodes();
 		if (childList == null) {
 			childList = new ArrayList<TreeNodeInfo>();
-            addChildNodes(childList);
+			addChildNodes(childList);
 		}
 		if (childList.add(child) && !silentAdd) {
-			ServiceManager.ExecuteResponders(ServiceManager.serviceType.ADD_NEW_NODE_SERVICE_ID, new AddNewNodeResponderData());
+			ServiceManager.ExecuteResponders(
+					ServiceManager.serviceType.ADD_NEW_NODE_SERVICE_ID,
+					new AddNewNodeResponderData());
 		}
 	}
-	
-@Override
+
+	@Override
 	public String toString() {
 
 		String fileName = "Unknown File";

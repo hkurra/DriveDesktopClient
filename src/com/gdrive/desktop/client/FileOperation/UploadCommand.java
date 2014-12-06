@@ -38,23 +38,61 @@ public class UploadCommand extends ICommand {
 	{
 		mCommandType = "UPLOAD";
 	}
+	/**
+	 * parent ID of file on which this command going to operate
+	 */
 	private String mParentID = null;
 
+	/**
+	 * Mime type of file on which this command going to operate
+	 */
 	private String mMimeType = null;
 
+	/**
+	 * Description of file on which this command going to operate
+	 */
 	private String mDescription = null;
 
+	/**
+	 * title of file on which this command going to operate
+	 */
 	private String mTitle = null;
 
+	/**
+	 * weather to delete local file after upload
+	 */
 	private boolean mDeleteFile = false;
 
+	/**
+	 * true if creating/uploading new folder
+	 */
 	private boolean mFolder = true;
 
+	/**
+	 * instance of GDRiveFIle
+	 */
 	private GDriveFile mGDriveFile = null;
+
+	/**
+	 * path of local file
+	 */
 	private java.io.File mLocalDiskFile;
+
+	/**
+	 * file instance after it get uploaded on server
+	 */
 	private com.google.api.services.drive.model.File mUploadedFile;
+
+	/**
+	 * type of upload operation i.e patch, touch, upload new ;
+	 */
 	private UploadOperation mUploadOperation;
+
+	/**
+	 * instance of your upload progress listoner
+	 */
 	private IProgressListoner uploadProgressListoner = null;
+
 	private TreePath mUplodedFileTreePath;
 
 	public static enum UploadOperation {
@@ -84,6 +122,11 @@ public class UploadCommand extends ICommand {
 		setUploadOperation(UploadOperation.NEW_UPLOAD);
 	}
 
+	/**
+	 * Initialize upload command
+	 * 
+	 * @param gDrivefile
+	 */
 	private void Init(GDriveFile gDrivefile) {
 		setGDriveFile(gDrivefile);
 		setDeleteFile(getGDriveFile().getDelateFile().booleanValue());
@@ -125,9 +168,10 @@ public class UploadCommand extends ICommand {
 				break;
 			case NEW_UPLOAD:
 				Drive.Files.Insert insert = isFolder() ? DriveDesktopClient.DRIVE
-						.files().insert(fileMetadata) : DriveDesktopClient.DRIVE
-						.files().insert(fileMetadata, fileContent);
-						
+						.files().insert(fileMetadata)
+						: DriveDesktopClient.DRIVE.files().insert(fileMetadata,
+								fileContent);
+
 				if (!isFolder()) {
 					enableProgressListoner(insert.getMediaHttpUploader());
 				}
@@ -140,7 +184,7 @@ public class UploadCommand extends ICommand {
 				if (this.mParentID == null
 						|| this.mParentID == GDriveFiles.MYDRIVE_ROOT_NODE_ID) {
 					uplodedFileTreeNodeInfo = GDriveFiles
-					.fileProcessing(getUploadedFile(),
+							.fileProcessing(getUploadedFile(),
 									GDriveFiles.getMyDriveRootNode());
 					List<TreeNodeInfo> directoryStructure = GDriveFiles
 							.getMyDriveDirectoryStructure();
@@ -159,9 +203,10 @@ public class UploadCommand extends ICommand {
 						break;
 					parentNodeInfo.addChild(uplodedFileTreeNodeInfo, false);
 				}
-				
+
 				if (isFolder()) {
-					uplodedFileTreeNodeInfo.put(GDriveFiles.IS_FOLDER_KEY, true);
+					uplodedFileTreeNodeInfo
+							.put(GDriveFiles.IS_FOLDER_KEY, true);
 				}
 				break;
 			case PATCH:
@@ -225,7 +270,7 @@ public class UploadCommand extends ICommand {
 	}
 
 	public int postExecute() {
-		//Check status in After upload callback on failure status is false 
+		// Check status in After upload callback on failure status is false
 		ServiceManager.ExecuteResponders(
 				ServiceManager.serviceType.AFTER_UPLOAD_SERVICE_ID,
 				new AfterFileUploadRespoderData(this, this.mUploadedFile));
@@ -253,6 +298,41 @@ public class UploadCommand extends ICommand {
 			}
 		}
 		return Boolean.valueOf(isExecutable);
+	}
+
+	/**
+	 * enable progress listener for upload command
+	 * 
+	 * @param uploader
+	 */
+	private void enableProgressListoner(MediaHttpUploader uploader) {
+		uploader.setProgressListener(new UploadProgressListoner(
+				getUploadProgressListoner()));
+		if (!isFolder()) {
+			long fileSize = getLocalDiskFile().length();
+			long inKB = fileSize / 1024L;
+			if (inKB > 512L) {
+				uploader.setDirectUploadEnabled(false);
+				uploader.setChunkSize(MediaHttpUploader.MINIMUM_CHUNK_SIZE);
+			}
+		}
+	}
+
+	/**
+	 * test parent ID is valid or not
+	 * 
+	 * @return
+	 */
+	private boolean isValidParentID() {
+		boolean isValidParent = false;
+
+		isValidParent = (this.mParentID != null)
+				&& (!this.mParentID.equals("-1"))
+				&& (this.mParentID.length() > 0)
+				&& (!this.mParentID.equals(GDriveFiles.MYDRIVE_ROOT_NODE_ID))
+				&& (!this.mParentID.equals(GDriveFiles.TRASHED_ROOT_NODE_ID));
+
+		return isValidParent;
 	}
 
 	public void setMimeType(String mMimeType) {
@@ -312,10 +392,10 @@ public class UploadCommand extends ICommand {
 	}
 
 	public Boolean setUploadedFile(
-			
-			com.google.api.services.drive.model.File UploadedFile) {
+
+	com.google.api.services.drive.model.File UploadedFile) {
 		this.mUploadedFile = UploadedFile;
-		
+
 		if (UploadedFile == null) {
 			mStatus = false;
 		}
@@ -343,33 +423,4 @@ public class UploadCommand extends ICommand {
 		return this.uploadProgressListoner;
 	}
 
-	/**
-	 * enable progress listener for upload command
-	 * 
-	 * @param uploader
-	 */
-	private void enableProgressListoner(MediaHttpUploader uploader) {
-		uploader.setProgressListener(new UploadProgressListoner(
-				getUploadProgressListoner()));
-		if (!isFolder()) {
-			long fileSize = getLocalDiskFile().length();
-			long inKB = fileSize / 1024L;
-			if (inKB > 512L) {
-				uploader.setDirectUploadEnabled(false);
-				uploader.setChunkSize(MediaHttpUploader.MINIMUM_CHUNK_SIZE);
-			}
-		}
-	}
-	
-	private boolean isValidParentID() {
-		boolean isValidParent = false;
-		
-		isValidParent = (this.mParentID != null) && (!this.mParentID.equals("-1"))
-				&& (this.mParentID.length() > 0) && (!this.mParentID.equals(GDriveFiles.MYDRIVE_ROOT_NODE_ID)) &&
-						(!this.mParentID.equals(GDriveFiles.TRASHED_ROOT_NODE_ID)); 
-			
-		
-		
-		return isValidParent;
-	}
 }
