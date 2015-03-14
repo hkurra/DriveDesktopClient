@@ -83,14 +83,7 @@ public class GDriveFiles {
 				}
 			} while (list.getPageToken() != null
 					&& list.getPageToken().length() > 0);
-			createDirectoryStructure();
-
-			mMyDriveRootNode.put("CHILD", getMyDriveDirectoryStructure());
-			mTrashedRootNode.put("CHILD", getTrashedDirectoryStructure());
-			getDirectoryStructure().add(mMyDriveRootNode);
-			getDirectoryStructure().add(mTrashedRootNode);
-
-			printDirectoryStructure();
+			
 		} catch (TokenResponseException tokenException) {
 			Logger.getLogger(DriveDesktopClient.class.getName()).log(
 					Level.SEVERE, null, tokenException);
@@ -117,6 +110,15 @@ public class GDriveFiles {
 			getMyDriveDirectoryStructure().clear();
 			getTrashedDirectoryStructure().clear();
 		}
+		
+		createDirectoryStructure();
+
+		mMyDriveRootNode.put("CHILD", getMyDriveDirectoryStructure());
+		mTrashedRootNode.put("CHILD", getTrashedDirectoryStructure());
+		getDirectoryStructure().add(mMyDriveRootNode);
+		getDirectoryStructure().add(mTrashedRootNode);
+
+		printDirectoryStructure();
 	}
 
 	/**

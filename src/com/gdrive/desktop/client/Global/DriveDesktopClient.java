@@ -174,6 +174,11 @@ public class DriveDesktopClient {
 	 * be opened in an particular application
 	 */
 	public static final String BINARY_FILE_MIME_TYPE = "application/octet-stream";
+	
+	/**
+	 * Google App script type
+	 */
+	public static final String GOOGLE_APP_SCRIPT = "application/vnd.google-apps.script";
 
 	static {
 		REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";

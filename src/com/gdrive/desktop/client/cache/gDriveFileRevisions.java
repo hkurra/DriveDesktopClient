@@ -1,5 +1,6 @@
 package com.gdrive.desktop.client.cache;
 
+import java.awt.Container;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -38,20 +39,20 @@ public class GDriveFileRevisions {
 	public static void cacheAllFileRevision() throws Exception {
 		final List<File> allFile = GDriveFiles.getAllFiles();
 		getAllFileRevision().clear();
-		try {
-			for (final File file : allFile) {
+		for (final File file : allFile) {
 
-				if (!file.getMimeType().equals(
-						DriveDesktopClient.FOLDER_MIME_TYPE)) {
-					getAllFileRevision().put(file.getId(),
-							getFileRevisionFromServer(file.getId()));
-				}
+			if (file.getMimeType().equals(
+					DriveDesktopClient.FOLDER_MIME_TYPE) || file.getMimeType().equals(
+							DriveDesktopClient.GOOGLE_APP_SCRIPT))  {
+				continue;
 			}
-
-		} catch (final Exception e) {
-			getAllFileRevision().clear();
-			Logger.getLogger(DriveDesktopClient.class.getName()).log(
-					Level.SEVERE, null, e);
+				try {
+				getAllFileRevision().put(file.getId(),
+						getFileRevisionFromServer(file.getId()));
+				}
+				catch(Exception e) {
+					
+				}
 		}
 	}
 
@@ -72,9 +73,12 @@ public class GDriveFileRevisions {
 			.list(fileID).execute();
 			return revisions.getItems();
 		} catch (final IOException e) {
-			System.out.print(GDriveFiles.searchFileID(fileID, false, true)
+			System.out.println(GDriveFiles.searchFileID(fileID, false, true)
 					.getTitle());
-			System.out.print(fileID);
+			System.out.println(fileID);
+			System.out.println(GDriveFiles.searchFileID(fileID, false, true)
+					.getMimeType());
+			
 			throw e;
 		}
 	}
