@@ -112,6 +112,14 @@ public class DriveDesktopClient {
 	 * list
 	 */
 	public static List<String> SCOPES;
+	
+
+	/**
+	 * Scope for which you want Authorization default Drive scope is there in
+	 * list
+	 */
+	public static Boolean NEED_MEMORY_CACHING = true;
+
 
 	/**
 	 * folder MIME type string constant
@@ -226,10 +234,11 @@ public class DriveDesktopClient {
 					.setApplicationName(APPLICATION_NAME).build();
 			isGdriveSetUped = (DRIVE != null);
 			try {
-				ABOUT = DRIVE.about().get().execute();
-
-				GDriveFiles.CacheAllFiles();
-				GDriveFileRevisions.cacheAllFileRevision();
+				ABOUT = DRIVE.about().get().execute();					
+				if (NEED_MEMORY_CACHING) {					
+					GDriveFiles.CacheAllFiles();
+					GDriveFileRevisions.cacheAllFileRevision();
+				}
 			} catch (TokenResponseException tokenException) {
 				Logger.getLogger(DriveDesktopClient.class.getName()).log(
 						Level.SEVERE, null, tokenException);
