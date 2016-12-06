@@ -1,27 +1,28 @@
 DriveDesktopClient
 ==================
 
-#java helper Library provide Modal part for google drive tree node structure & file operation on it like.
-- upload new file/folder
-- Trash/delete file
-- copy file
-- download file from server
-- Update/touch file metadata
+**Java helper library provides Modal part for google drive tree node structure and file operations on it like -**
 
-also its easy to authorize this library to use user google drive i.e you just have to set up this library it will take care
-of get authorization from User.
+1. Upload a new file/folder
+2. Trash/delete a file
+3. Copy a file
+4. Download a file from server
+5. Update/touch a file metadata
 
-#Using this you can replicate google drive UI structure & perform above mention operation on it in your java application.
+Also it is easy to authorize user's google drive using this library i.e you just have to set up this library and it will take care
+of the authorization by itself.
 
-#build pre requisite
+Besides, using this library you can replicate google drive UI structure & perform above mention operation on it in your java application.
+
+###Build pre-requisite
 * java 7 sdk 
 * maven build environment
 
-#compiling instruction
+###Compiling instructions
 * download zip file & Unzip it
-* perform maven install i.e "mvn install" from command line
+* perform maven install using "mvn install" from command line
 
-#using instruction 
+###using instruction 
 *javaDocs are available under Build_jar/javadoc folder
 * minimum code required to set up ths library
 * DriveDesktopClient.CLIENT_ID = "YOUR CLIENT ID";
