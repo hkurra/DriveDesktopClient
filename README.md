@@ -2,11 +2,12 @@ DriveDesktopClient
 ==================
 
 #java helper Library provide Modal part for google drive tree node structure & file operation on it like.
-1)upload new file/folder
-2)Trash/delete file
-3)copy file
-4)download file from server
-5)Update/touch file metadata
+- upload new file/folder
+- Trash/delete file
+- copy file
+- download file from server
+- Update/touch file metadata
+
 also its easy to authorize this library to use user google drive i.e you just have to set up this library it will take care
 of get authorization from User.
 
