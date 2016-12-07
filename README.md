@@ -25,10 +25,11 @@ Besides, using this library you can replicate google drive UI structure & perfor
 ###Using instruction 
 * javaDocs are available under Build_jar/javadoc folder
 * minimum code required to set up ths library
+```
 * DriveDesktopClient.CLIENT_ID = "YOUR CLIENT ID";
 * DriveDesktopClient.CLIENT_SECRET = "YOUR CLIENT SECRET";
 * DriveDesktopClient.APPLICATION_NAME = "YOUR APPLICATION NAME";
-```
+
 * if (DriveDesktopClient.setUpGDrive()){
 	//Set Up your Application
   }
