@@ -21,9 +21,9 @@ Besides, using this library you can replicate google drive UI structure & perfor
 ###Compiling instructions
 * Clone this repository or Download zip file & Unzip it
 * perform maven install using "mvn install" from command line 
-            OR
+    #Using Eclipse
 * Import the root directory in Eclipse as project
-* unzip "lib" folder.
+* unzip "dist/lib.rar".
 
 ###Using instruction 
 * javaDocs are available under Build_jar/javadoc folder
